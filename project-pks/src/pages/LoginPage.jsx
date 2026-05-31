@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/common/Button';
+import logoJasaRaharja from '../assets/logo_jasa_raharja.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -54,12 +55,8 @@ export default function LoginPage() {
 
         {/* Logo/Header */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner">
-            <span className="font-extrabold text-base tracking-wider text-white">JR</span>
-          </div>
-          <div>
-            <h2 className="font-black text-sm tracking-widest uppercase">PT. Jasa Raharja</h2>
-            <p className="text-[9px] text-blue-200 tracking-wider font-bold">MEMBER OF IFG</p>
+          <div className="bg-white px-4 py-2 rounded-xl shadow-md flex items-center justify-center">
+            <img src={logoJasaRaharja} alt="Logo Jasa Raharja" className="h-10 object-contain" />
           </div>
         </div>
 
@@ -72,16 +69,16 @@ export default function LoginPage() {
             Manajemen Perjanjian Kerja Sama (PKS)
           </h1>
           <p className="text-blue-100/80 text-sm font-light leading-relaxed">
-            Platform digital terintegrasi untuk mengelola dokumen kemitraan, memantau masa aktif secara otomatis, dan meningkatkan efisiensi operasional BUMN secara akuntabel.
+            Sistem digital yang membantu mengelola dokumen kerja sama, memantau masa berlaku secara otomatis, dan membuat pekerjaan lebih cepat serta terorganisir.
           </p>
         </div>
 
         {/* Bawah: Footer & Akreditasi */}
         <div className="relative z-10 flex items-center justify-between text-xs text-blue-200/60 font-semibold border-t border-white/10 pt-6">
-          <p>© 2024 Jasa Raharja</p>
+          <p>© 2026 Jasa Raharja</p>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <p className="tracking-wider text-[10px]">SECURED GATEWAY</p>
+            <p className="tracking-wider text-[10px]">AKSES AMAN</p>
           </div>
         </div>
       </div>
@@ -101,7 +98,7 @@ export default function LoginPage() {
               Selamat Datang
             </h2>
             <p className="text-slate-400 text-sm font-medium">
-              Masukkan kredensial Admin Anda untuk masuk ke sistem.
+              Masukkan email dan kata sandi Anda untuk masuk ke sistem.
             </p>
           </div>
 
@@ -122,7 +119,7 @@ export default function LoginPage() {
             {/* Field Email */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-[11px] font-bold text-slate-500 tracking-widest uppercase">
-                Email Korporat
+                Email
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#003b87] transition-colors">
@@ -133,7 +130,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="adminpks@jasaraharja.co.id"
+                  placeholder="Masukkan Email Anda"
                   className="block w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#003b87] transition-all text-sm font-semibold"
                   required
                 />
@@ -187,13 +184,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          {/* Akun Demonstrasi info box */}
-          <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100/50 text-[11px] font-semibold text-[#003b87] space-y-1">
-            <p className="font-bold uppercase tracking-wider text-[#003b87]/80">Akun Login Pengujian:</p>
-            <p>Email: <span className="font-mono text-slate-700 bg-white px-1 py-0.5 rounded border border-slate-100">adminpks@jasaraharja.co.id</span></p>
-            <p>Sandi: <span className="font-mono text-slate-700 bg-white px-1 py-0.5 rounded border border-slate-100">admin01</span></p>
-          </div>
         </div>
       </div>
     </div>
