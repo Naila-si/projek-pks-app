@@ -14,7 +14,7 @@ export default function PKSBarChart({ iwkbuCount = 0, iwklCount = 0 }) {
             <h3 className="font-bold text-slate-800 text-base">Jumlah PKS Berdasarkan Jenis</h3>
             <p className="text-xs text-slate-400 font-medium mt-0.5">Distribusi kategori perjanjian kerja sama aktif</p>
           </div>
-          <span className="text-[10px] font-bold bg-[#e8f1fc] text-[#003b87] px-2 py-0.5 rounded-full uppercase tracking-wider">LIVE</span>
+          <span className="text-[10px] font-bold bg-[#e8f1fc] text-[#003b87] px-2 py-0.5 rounded-full uppercase tracking-wider">LANGSUNG</span>
         </div>
       </div>
 

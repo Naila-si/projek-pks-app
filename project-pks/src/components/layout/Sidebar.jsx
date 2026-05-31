@@ -60,11 +60,6 @@ export default function Sidebar() {
       icon: Bell,
       badge: unreadCount > 0 ? unreadCount : null
     },
-    {
-      name: 'Kalender',
-      path: '#', // Placeholder sesuai gambar
-      icon: Calendar
-    }
   ];
 
   return (
@@ -82,8 +77,8 @@ export default function Sidebar() {
             <span className="font-extrabold text-lg tracking-wider">JR</span>
           </div>
           <div className={`transition-[width,opacity,margin] duration-300 ease-in-out overflow-hidden whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0 ml-0' : 'w-36 opacity-100 ml-3'}`}>
-            <h1 className="font-extrabold text-[#003b87] text-base tracking-tight leading-none">PKS</h1>
-            <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">Management</p>
+            <h1 className="font-extrabold text-[#003b87] text-base tracking-tight leading-none">Manajemen</h1>
+            <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">PKS</p>
           </div>
         </div>
       </div>
@@ -108,7 +103,7 @@ export default function Sidebar() {
           return (
             <div key={index} className="w-full">
               {isPlaceholder ? (
-                <div className={placeholderClass} title={isCollapsed ? `${item.name} (Soon)` : undefined}>
+                <div className={placeholderClass} title={isCollapsed ? `${item.name} (Segera)` : undefined}>
                   {isCollapsed ? (
                     <div className="relative flex items-center justify-center w-full h-full">
                       <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -121,7 +116,7 @@ export default function Sidebar() {
                           {item.name}
                         </span>
                       </div>
-                      <span className="text-[9px] font-bold bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded uppercase tracking-wider flex-shrink-0">Soon</span>
+                      <span className="text-[9px] font-bold bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded uppercase tracking-wider flex-shrink-0">Segera</span>
                     </>
                   )}
                 </div>

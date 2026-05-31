@@ -48,7 +48,7 @@ export default function ExportButton({ onExport, dataName = 'Data' }) {
         {exportingType === 'excel' && 'Mengekspor Excel...'}
         {exportingType === 'sheets' && 'Mengekspor Sheets...'}
         {exportingType === null && exportSuccess && 'Berhasil Diekspor'}
-        {exportingType === null && !exportSuccess && 'Export'}
+        {exportingType === null && !exportSuccess && 'Ekspor'}
       </Button>
 
       {isOpen && (

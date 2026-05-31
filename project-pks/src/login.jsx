@@ -50,14 +50,14 @@ export default function Login() {
               </div>
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold tracking-tight leading-tight">
-                  PKS Management System
+                  Sistem Manajemen PKS
                 </h1>
               </div>
             </div>
 
             {/* Deskripsi */}
             <p className="text-white/85 text-sm lg:text-base font-light leading-relaxed mb-10">
-              Digital system for managing partnership agreement (PKS) data efficiently, securely, and systematically. Experience institutional-grade security with modern administrative efficiency.
+              Sistem digital untuk mengelola data Perjanjian Kerja Sama (PKS) secara efisien, aman, dan sistematis. Rasakan keamanan tingkat institusional dengan efisiensi administratif modern.
             </p>
 
             {/* Statistik di Bagian Bawah Kartu */}
@@ -105,10 +105,10 @@ export default function Login() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                    Welcome back
+                    Selamat datang kembali
                   </h2>
                   <p className="text-slate-400 text-sm mt-1.5 font-normal">
-                    Please sign in to continue to your dashboard
+                    Silakan masuk untuk melanjutkan ke dasbor Anda
                   </p>
                 </div>
 
@@ -122,7 +122,7 @@ export default function Login() {
                 {/* EMAIL ADDRESS */}
                 <div className="space-y-2">
                   <label htmlFor="email" className="block text-[11px] font-bold text-slate-600 tracking-widest uppercase">
-                    EMAIL ADDRESS
+                    ALAMAT EMAIL
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -143,7 +143,7 @@ export default function Login() {
                 {/* PASSWORD */}
                 <div className="space-y-2">
                   <label htmlFor="password" className="block text-[11px] font-bold text-slate-600 tracking-widest uppercase">
-                    PASSWORD
+                    KATA SANDI
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -180,7 +180,7 @@ export default function Login() {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                   ) : (
-                    'Login'
+                    'Masuk'
                   )}
                 </button>
 
@@ -191,11 +191,11 @@ export default function Login() {
                 <div className="flex justify-center items-center gap-6 text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-slate-400" strokeWidth={2} />
-                    <span className="text-[10px] font-bold tracking-widest uppercase">SECURED</span>
+                    <span className="text-[10px] font-bold tracking-widest uppercase">AMAN</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-slate-400" strokeWidth={2} />
-                    <span className="text-[10px] font-bold tracking-widest uppercase">ENCRYPTED</span>
+                    <span className="text-[10px] font-bold tracking-widest uppercase">TERENKRIPSI</span>
                   </div>
                 </div>
               </form>
