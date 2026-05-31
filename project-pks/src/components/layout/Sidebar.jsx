@@ -7,7 +7,6 @@ import {
   FileSignature, 
   Building2, 
   Bell, 
-  Calendar, 
   LogOut,
   ShieldAlert
 } from 'lucide-react';
