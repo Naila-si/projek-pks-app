@@ -1,0 +1,56 @@
+[
+  {
+    "id": "NOTIF-001",
+    "pks_id": "PKS-002",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-28T08:00:00.000Z"
+  },
+  {
+    "id": "NOTIF-002",
+    "pks_id": "PKS-009",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-29T09:00:00.000Z"
+  },
+  {
+    "id": "NOTIF-003",
+    "pks_id": "PKS-003",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-27T10:00:00.000Z"
+  },
+  {
+    "id": "NOTIF-004",
+    "pks_id": "PKS-004",
+    "dibaca": true,
+    "tanggal_dibuat": "2026-05-26T11:00:00.000Z"
+  },
+  {
+    "id": "NOTIF-005",
+    "pks_id": "PKS-006",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-28T14:30:00.000Z"
+  },
+  {
+    "id": "NOTIF-006",
+    "pks_id": "PKS-007",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-26T07:15:00.000Z"
+  },
+  {
+    "id": "NOTIF-007",
+    "pks_id": "PKS-008",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-25T16:00:00.000Z"
+  },
+  {
+    "id": "NOTIF-008",
+    "pks_id": "PKS-010",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-24T09:40:00.000Z"
+  },
+  {
+    "id": "NOTIF-009",
+    "pks_id": "PKS-011",
+    "dibaca": false,
+    "tanggal_dibuat": "2026-05-24T12:00:00.000Z"
+  }
+]

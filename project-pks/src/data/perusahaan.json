@@ -1,0 +1,101 @@
+[
+  {
+    "id": "COMP-001",
+    "nama_perusahaan": "PT. Artha Nugraha",
+    "nama_pengelola": "Bambang Wijaya",
+    "alamat": "Jakarta Selatan, DKI Jakarta",
+    "email": "bambang.w@arthanugraha.com",
+    "telepon": "+62 812-3456-7890",
+    "created_at": "2023-01-10T08:00:00.000Z"
+  },
+  {
+    "id": "COMP-002",
+    "nama_perusahaan": "CV. Sinar Mandiri",
+    "nama_pengelola": "Siti Aminah",
+    "alamat": "Surabaya, Jawa Timur",
+    "email": "siti.aminah@sinarmandiri.co.id",
+    "telepon": "+62 856-7890-1234",
+    "created_at": "2023-03-05T09:30:00.000Z"
+  },
+  {
+    "id": "COMP-003",
+    "nama_perusahaan": "PO. Ahmad Pratama",
+    "nama_pengelola": "Ahmad Pratama",
+    "alamat": "Bandung, Jawa Barat",
+    "email": "ahmad.pratama@pratamagroup.id",
+    "telepon": "+62 813-2211-0099",
+    "created_at": "2022-05-15T14:20:00.000Z"
+  },
+  {
+    "id": "COMP-004",
+    "nama_perusahaan": "PT. Logistik Bersama",
+    "nama_pengelola": "Rudi Hartono",
+    "alamat": "Medan, Sumatera Utara",
+    "email": "rudi.h@logistikbersama.com",
+    "telepon": "+62 821-4455-6677",
+    "created_at": "2022-08-20T10:15:00.000Z"
+  },
+  {
+    "id": "COMP-005",
+    "nama_perusahaan": "PT. Transportasi Maju Jaya",
+    "nama_pengelola": "Budi Santoso",
+    "alamat": "Jakarta Pusat, DKI Jakarta",
+    "email": "budi.s@maju-jaya.com",
+    "telepon": "+62 811-9988-7766",
+    "created_at": "2023-01-01T08:00:00.000Z"
+  },
+  {
+    "id": "COMP-006",
+    "nama_perusahaan": "CV. Samudera Logistik",
+    "nama_pengelola": "Hendra Wijaya",
+    "alamat": "Semarang, Jawa Tengah",
+    "email": "hendra@samuderalogistik.com",
+    "telepon": "+62 815-5544-3322",
+    "created_at": "2023-03-15T11:00:00.000Z"
+  },
+  {
+    "id": "COMP-007",
+    "nama_perusahaan": "PT. Angkatan Cepat Sejahtera",
+    "nama_pengelola": "Yusuf Mansur",
+    "alamat": "Makassar, Sulawesi Selatan",
+    "email": "yusuf.m@angkatan-cepat.com",
+    "telepon": "+62 812-7788-9900",
+    "created_at": "2022-01-01T08:00:00.000Z"
+  },
+  {
+    "id": "COMP-008",
+    "nama_perusahaan": "Koperasi Jasa Armada",
+    "nama_pengelola": "Sugeng Riyadi",
+    "alamat": "Balikpapan, Kalimantan Timur",
+    "email": "sugeng@koperasiarmada.or.id",
+    "telepon": "+62 823-1122-3344",
+    "created_at": "2021-08-10T10:00:00.000Z"
+  },
+  {
+    "id": "COMP-009",
+    "nama_perusahaan": "PT. Trans Jakarta Utama",
+    "nama_pengelola": "Wibowo Prasetyo",
+    "alamat": "Jakarta Barat, DKI Jakarta",
+    "email": "wibowo@transjakartautama.co.id",
+    "telepon": "+62 812-9900-1122",
+    "created_at": "2023-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "COMP-010",
+    "nama_perusahaan": "CV. Bahari Perkasa",
+    "nama_pengelola": "Lukas Wibowo",
+    "alamat": "Surabaya, Jawa Timur",
+    "email": "lukas@bahariperkasa.co.id",
+    "telepon": "+62 856-1122-3344",
+    "created_at": "2021-05-01T08:00:00.000Z"
+  },
+  {
+    "id": "COMP-011",
+    "nama_perusahaan": "UD. Maju Bersama",
+    "nama_pengelola": "Slamet Rahardjo",
+    "alamat": "Yogyakarta, DIY",
+    "email": "slamet@majubersama.web.id",
+    "telepon": "+62 813-8899-7766",
+    "created_at": "2019-08-10T08:00:00.000Z"
+  }
+]
