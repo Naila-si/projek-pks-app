@@ -38,20 +38,17 @@ export const authService = {
   },
 
   /**
-   * Log out from the backend and invalidate Sanctum token
+   * Log out from the backend and invalidate Sanctum token instantly
    */
-  async logout() {
-    try {
-      // Send logout request to backend to revoke token
-      await api.post('/logout');
-    } catch (error) {
+  logout() {
+    // 1. Clear local credentials instantly to make UI response immediate
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(SESSION_KEY);
+
+    // 2. Perform backend API logout call asynchronously in background
+    api.post('/logout').catch(error => {
       console.warn('Backend logout failed or session already expired:', error);
-    } finally {
-      // Always clear local session storage even if backend call fails
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(SESSION_KEY);
-      window.location.href = '/login';
-    }
+    });
   },
 
   /**
