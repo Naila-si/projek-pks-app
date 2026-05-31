@@ -157,6 +157,25 @@ export function usePKS() {
     }
   }, []);
 
+  /**
+   * Delete a PKS record. (Optimistic UI Update for Instant response)
+   */
+  const deletePKS = useCallback(async (id) => {
+    // 1. Instantly filter out from local state for immediate visual response
+    setPksList(prev => prev.filter(p => p.id_pks !== id && p.id !== id));
+    
+    // 2. Perform delete in background
+    try {
+      const response = await api.delete(`/pks/${id}`);
+      return response;
+    } catch (err) {
+      console.error('Delete PKS in background failed:', err);
+      // Silently sync local state again if failed
+      refreshPKS();
+      throw err;
+    }
+  }, [refreshPKS]);
+
   // Fetch initial PKS list on component load
   useEffect(() => {
     Promise.resolve().then(() => {
@@ -171,6 +190,7 @@ export function usePKS() {
     refreshPKS,
     addPKS,
     editPKS,
-    getPKSById
+    getPKSById,
+    deletePKS
   };
 }

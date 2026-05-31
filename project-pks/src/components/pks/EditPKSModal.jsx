@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { X, FileText, Upload } from 'lucide-react';
 import { usePKS } from '../../hooks/usePKS';
 import Button from '../common/Button';
+import { toast } from '../../utils/toast';
 
 export default function EditPKSModal({ pksId, onClose, onSubmit }) {
   const { getPKSById } = usePKS();
@@ -35,21 +36,34 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
         }
       }).catch(err => {
         console.error('Failed to load PKS details:', err);
-        alert('Gagal memuat detail PKS dari server.');
+        toast.error('Gagal memuat detail PKS dari server.');
       });
     }
   }, [pksId, getPKSById]);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      setDocumentFile(e.target.files[0]);
+      const file = e.target.files[0];
+      // Pengecekan instan ukuran file (10MB = 10 * 1024 * 1024 bytes)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Ukuran Berkas Terlalu Besar');
+        e.target.value = ''; // Reset inputan file
+        setDocumentFile(null);
+        return;
+      }
+      setDocumentFile(file);
     }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!nomorPKS || !judulPKS || !tanggalMulai || !tanggalBerakhir) {
-      alert('Harap isi semua kolom wajib!');
+      toast.warning('Harap isi semua kolom wajib!');
+      return;
+    }
+
+    if (documentFile && documentFile.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Gagal Menyimpan');
       return;
     }
 

@@ -20,6 +20,8 @@ import EmptyState from '../components/common/EmptyState';
 import ExportButton from '../components/common/ExportButton';
 import EditCompanyModal from '../components/company/EditCompanyModal';
 import { api } from '../services/api';
+import logoJasaRaharja from '../assets/logo_jasa_raharja.png';
+import { toast } from '../utils/toast';
 
 export default function DataPerusahaanPage() {
   const navigate = useNavigate();
@@ -141,20 +143,322 @@ export default function DataPerusahaanPage() {
       await editCompany(selectedCompanyId, updatedCompany);
       setIsEditOpen(false);
     } catch (err) {
-      alert(err.message || 'Gagal memperbarui data perusahaan.');
+      toast.error(err.message || 'Gagal memperbarui data perusahaan.');
     }
   };
 
+  // Penanganan Ekspor Excel (.xlsx) & PDF (.pdf) Premium
   const handleExport = (exportType) => {
-    const format = exportType === 'excel' ? 'xlsx' : 'csv';
-    const queryParams = new URLSearchParams();
-    
-    if (searchQuery) queryParams.append('search', searchQuery);
-    queryParams.append('sort', sortOrder === 'Terbaru' ? 'latest' : 'oldest');
-    queryParams.append('format', format);
+    if (exportType === 'excel') {
+      const queryParams = new URLSearchParams();
+      if (searchQuery) queryParams.append('search', searchQuery);
+      queryParams.append('sort', sortOrder === 'Terbaru' ? 'latest' : 'oldest');
+      queryParams.append('format', 'xlsx');
 
-    const filename = `Data_Perusahaan_JR_${new Date().toISOString().slice(0, 10)}.${format}`;
-    api.download(`/export/perusahaan?${queryParams.toString()}`, filename);
+      const filename = `Data_Perusahaan_JR_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      
+      // Unduh langsung Excel dari backend
+      api.download(`/export/perusahaan?${queryParams.toString()}`, filename);
+    } else if (exportType === 'pdf') {
+      // Buka jendela baru untuk Cetak Laporan PDF
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast.warning('Gagal membuka jendela cetak. Mohon izinkan pop-up pada browser Anda.', 'Cetak Terblokir');
+        return;
+      }
+
+      // Baris tabel data perusahaan mitra
+      const companyRows = filteredCompanies.map((company, index) => {
+        const statusColor = company.statusPKS === 'Aktif' 
+          ? 'color: #059669; background-color: #ecfdf5; border-color: #10b981;' 
+          : company.statusPKS === 'Segera Berakhir'
+            ? 'color: #d97706; background-color: #fffbeb; border-color: #f59e0b;'
+            : company.statusPKS === 'Berakhir'
+              ? 'color: #dc2626; background-color: #fef2f2; border-color: #ef4444;'
+              : 'color: #64748b; background-color: #f8fafc; border-color: #cbd5e1;';
+              
+        return `
+          <tr>
+            <td style="text-align: center; font-family: monospace;">${index + 1}</td>
+            <td>
+              <div style="font-weight: 800; color: #1e293b; font-size: 11px;">${company.nama_perusahaan}</div>
+              ${company.alamat ? `<div style="font-size: 9px; color: #64748b; margin-top: 2px; font-weight: normal;">${company.alamat}</div>` : ''}
+            </td>
+            <td style="color: #334155; font-size: 10.5px;">${company.nama_pengelola || '-'}</td>
+            <td style="color: #475569; font-size: 10px; font-family: monospace;">${company.telepon || '-'}</td>
+            <td style="text-align: center; font-weight: 700; color: #003b87; font-size: 11px;">${company.pksCount}</td>
+            <td style="text-align: center;">
+              <span style="font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 6px; border: 1px solid; ${statusColor}">
+                ${company.statusPKS}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Laporan Data Perusahaan Mitra - Jasa Raharja</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+            
+            @page {
+              size: portrait;
+              margin: 15mm;
+            }
+            
+            body {
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              color: #1e293b;
+              margin: 0;
+              padding: 0;
+              background-color: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            
+            .header-container {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 3px double #cbd5e1;
+              padding-bottom: 15px;
+              margin-bottom: 20px;
+            }
+            
+            .logo-section {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+            
+            .logo-bumn {
+              font-size: 11px;
+              font-weight: 700;
+              color: #00829B;
+              letter-spacing: 1px;
+              border-left: 2px solid #cbd5e1;
+              padding-left: 12px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+            }
+            
+            .title-section {
+              text-align: right;
+            }
+            
+            .doc-title {
+              font-size: 18px;
+              font-weight: 800;
+              color: #003b87;
+              margin: 0 0 4px 0;
+              letter-spacing: -0.3px;
+            }
+            
+            .doc-subtitle {
+              font-size: 11px;
+              color: #64748b;
+              font-weight: 500;
+              margin: 0;
+            }
+            
+            .meta-grid {
+              display: grid;
+              grid-template-cols: repeat(4, 1fr);
+              gap: 15px;
+              background-color: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 12px 18px;
+              margin-bottom: 25px;
+              font-size: 11px;
+            }
+            
+            .meta-item {
+              display: flex;
+              flex-direction: column;
+              gap: 2px;
+            }
+            
+            .meta-label {
+              font-weight: 700;
+              color: #94a3b8;
+              text-transform: uppercase;
+              font-size: 9px;
+              letter-spacing: 0.5px;
+            }
+            
+            .meta-value {
+              font-weight: 600;
+              color: #334155;
+            }
+            
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+              font-size: 11px;
+            }
+            
+            th {
+              background-color: #003b87;
+              color: #ffffff;
+              font-weight: 700;
+              text-transform: uppercase;
+              font-size: 9px;
+              letter-spacing: 0.5px;
+              padding: 10px 12px;
+              border: 1px solid #003b87;
+              text-align: left;
+            }
+            
+            th.text-center {
+              text-align: center;
+            }
+            
+            td {
+              padding: 10px 12px;
+              border-bottom: 1px solid #e2e8f0;
+              border-left: 1px solid #f1f5f9;
+              border-right: 1px solid #f1f5f9;
+              vertical-align: middle;
+            }
+            
+            tr:nth-child(even) {
+              background-color: #f8fafc;
+            }
+            
+            tr {
+              break-inside: avoid;
+            }
+            
+            .mengetahui-title {
+              text-align: center;
+              font-size: 11px;
+              font-weight: 600;
+              margin-top: 50px;
+              margin-bottom: 10px;
+              color: #64748b;
+              break-inside: avoid;
+            }
+            
+            .footer-signature {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 10px;
+              font-size: 11px;
+              break-inside: avoid;
+              padding: 0 20px;
+            }
+            
+            .signature-box {
+              text-align: center;
+              width: 250px;
+            }
+            
+            .signature-role {
+              color: #475569;
+              font-weight: 600;
+              min-height: 32px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            
+            .signature-space {
+              height: 55px;
+            }
+            
+            .signature-name {
+              font-weight: 700;
+              color: #1e293b;
+              border-bottom: 1.5px solid #1e293b;
+              padding-bottom: 2px;
+              display: inline-block;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header-container">
+            <div class="logo-section">
+              <img src="${logoJasaRaharja}" alt="Jasa Raharja Logo" style="height: 42px; width: auto;" />
+              <div class="logo-bumn">BUMN UNTUK INDONESIA</div>
+            </div>
+            <div class="title-section">
+              <h1 class="doc-title">LAPORAN DATA MITRA PERUSAHAAN</h1>
+              <p class="doc-subtitle">PT Jasa Raharja - Kantor Wilayah Riau</p>
+            </div>
+          </div>
+          
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Tanggal Cetak</span>
+              <span class="meta-value">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Kata Kunci Pencarian</span>
+              <span class="meta-value">${searchQuery ? searchQuery : 'Semua'}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Urutan Tampilan</span>
+              <span class="meta-value">Mitra ${sortOrder}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Total Item</span>
+              <span class="meta-value">${filteredCompanies.length} Perusahaan</span>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 5%;" class="text-center">No</th>
+                <th style="width: 40%;">Nama Perusahaan Rekanan</th>
+                <th style="width: 20%;">Nama Pengelola</th>
+                <th style="width: 15%;">Kontak Telepon</th>
+                <th style="width: 10%;" class="text-center">Jumlah PKS</th>
+                <th style="width: 10%;" class="text-center">Status PKS</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${companyRows}
+            </tbody>
+          </table>
+          
+          <div class="mengetahui-title">Mengetahui,</div>
+          <div class="footer-signature">
+            <div class="signature-box">
+              <div class="signature-role">Kepala Sub Bagian Iuran Wajib</div>
+              <div class="signature-space"></div>
+              <div class="signature-name">Esga Putra Pradana, S.E.</div>
+            </div>
+            
+            <div class="signature-box">
+              <div class="signature-role">Kepala Kantor Wilayah Jasa Raharja Riau</div>
+              <div class="signature-space"></div>
+              <div class="signature-name">Muhammad Hidayat, SE.</div>
+            </div>
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            };
+          </script>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
   };
 
   const cardList = [

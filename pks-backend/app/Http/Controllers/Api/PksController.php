@@ -166,4 +166,33 @@ class PksController extends Controller
             'data' => new PksResource($pks->load('perusahaan'))
         ], 200);
     }
+
+    public function destroy($id)
+    {
+        $pks = DataPKS::findOrFail($id);
+        $id_perusahaan = $pks->id_perusahaan;
+
+        // Hapus file fisik PDF jika ada di server disk
+        if ($pks->dokumen_pks) {
+            Storage::delete('public/pks/' . $pks->dokumen_pks);
+        }
+
+        $pks->delete();
+
+        // Pengecekan cascade delete perusahaan rekanan jika tidak ada kontrak PKS lain
+        if ($id_perusahaan) {
+            $otherPksCount = DataPKS::where('id_perusahaan', $id_perusahaan)->count();
+            if ($otherPksCount === 0) {
+                $perusahaan = Perusahaan::find($id_perusahaan);
+                if ($perusahaan) {
+                    $perusahaan->delete();
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data PKS berhasil dihapus.'
+        ], 200);
+    }
 }

@@ -1,4 +1,5 @@
 // src/services/api.js
+import { toast } from '../utils/toast';
 
 const BASE_URL = 'http://127.0.0.1:8000/api';
 const TOKEN_KEY = 'pks_auth_token';
@@ -110,7 +111,7 @@ export const api = {
     })
     .catch(error => {
       console.error('Download error:', error);
-      alert('Gagal mengunduh file.');
+      toast.error('Gagal mengunduh berkas dari server.', 'Unduhan Gagal');
     });
   }
 };

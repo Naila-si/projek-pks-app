@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { X, Building } from 'lucide-react';
 import { useCompany } from '../../hooks/useCompany';
 import Button from '../common/Button';
+import { toast } from '../../utils/toast';
 
 export default function EditCompanyModal({ companyId, onClose, onSubmit }) {
   const { getCompanyById } = useCompany();
@@ -29,7 +30,7 @@ export default function EditCompanyModal({ companyId, onClose, onSubmit }) {
         }
       }).catch(err => {
         console.error('Failed to load company details:', err);
-        alert('Gagal memuat profil perusahaan dari server.');
+        toast.error('Gagal memuat profil perusahaan dari server.');
       });
     }
   }, [companyId, getCompanyById]);
@@ -37,7 +38,7 @@ export default function EditCompanyModal({ companyId, onClose, onSubmit }) {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!namaPerusahaan) {
-      alert('Harap isi nama perusahaan!');
+      toast.warning('Harap isi nama perusahaan!');
       return;
     }
 

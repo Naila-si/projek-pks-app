@@ -5,6 +5,7 @@ import {
   Search, 
   Eye, 
   Edit2, 
+  Trash2,
   FileSignature, 
   ChevronLeft,
   ChevronRight
@@ -19,16 +20,21 @@ import AddPKSModal from '../components/pks/AddPKSModal';
 import EditPKSModal from '../components/pks/EditPKSModal';
 import DetailPKSModal from '../components/pks/DetailPKSModal';
 import { api } from '../services/api';
+import { createPortal } from 'react-dom';
+import logoJasaRaharja from '../assets/logo_jasa_raharja.png';
+import { toast } from '../utils/toast';
 
 export default function DataPKSPage() {
-  const { pksList, loading: loadingPks, refreshPKS, addPKS, editPKS } = usePKS();
+  const { pksList, loading: loadingPks, refreshPKS, addPKS, editPKS, deletePKS } = usePKS();
   const { refreshCompanies } = useCompany();
 
   // State Modal
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedPKSId, setSelectedPKSId] = useState(null);
+  const [deletingPKSId, setDeletingPKSId] = useState(null);
 
   // State Filter & Pencarian
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,7 +97,7 @@ export default function DataPKSPage() {
       refreshCompanies();
       setIsAddOpen(false);
     } catch (err) {
-      alert(err.message || 'Gagal menyimpan PKS baru.');
+      toast.error(err.message || 'Gagal menyimpan PKS baru.');
     }
   };
 
@@ -106,7 +112,7 @@ export default function DataPKSPage() {
       await editPKS(selectedPKSId, updatedPKS);
       setIsEditOpen(false);
     } catch (err) {
-      alert(err.message || 'Gagal memperbarui data PKS.');
+      toast.error(err.message || 'Gagal memperbarui data PKS.');
     }
   };
 
@@ -116,21 +122,351 @@ export default function DataPKSPage() {
     setIsDetailOpen(true);
   };
 
-  // Penanganan Ekspor CSV & Excel melalui Backend
-  const handleExport = (exportType) => {
-    const format = exportType === 'excel' ? 'xlsx' : 'csv';
-    const queryParams = new URLSearchParams();
-    
-    if (searchQuery) queryParams.append('search', searchQuery);
-    if (statusFilter && statusFilter !== 'Semua') queryParams.append('status', statusFilter);
-    if (jenisPKSFilter && jenisPKSFilter !== 'Semua') queryParams.append('jenis_pks', jenisPKSFilter);
-    if (jenisObjekFilter && jenisObjekFilter !== 'Semua') queryParams.append('jenis_objek', jenisObjekFilter);
-    queryParams.append('format', format);
+  // Penanganan Hapus PKS
+  const handleDeleteClick = (id) => {
+    setDeletingPKSId(id);
+    setIsDeleteOpen(true);
+  };
 
-    const filename = `Data_PKS_JasaRaharja_${new Date().toISOString().slice(0, 10)}.${format}`;
+  const handleDeleteConfirm = () => {
+    // 1. Tutup modal secara instan
+    setIsDeleteOpen(false);
     
-    // Download directly using the api.download helper
-    api.download(`/export/pks?${queryParams.toString()}`, filename);
+    // 2. Picu proses hapus di background (mengubah local state seketika)
+    deletePKS(deletingPKSId).then(() => {
+      // Segarkan daftar perusahaan senyap di background untuk mensinkronisasi data perusahaan yang ikut terhapus
+      refreshCompanies();
+    }).catch(err => {
+      toast.error(err.message || 'Gagal menghapus data PKS.');
+    });
+    
+    // 3. Kosongkan ID hapus secara instan
+    setDeletingPKSId(null);
+    
+    // 4. Tampilkan notifikasi sukses kustom secara instan seketika itu juga!
+    toast.success('Data PKS berhasil dihapus.', 'Berhasil');
+  };
+
+  // Penanganan Ekspor Excel (.xlsx) & PDF (.pdf) Premium
+  const handleExport = (exportType) => {
+    if (exportType === 'excel') {
+      const queryParams = new URLSearchParams();
+      if (searchQuery) queryParams.append('search', searchQuery);
+      if (statusFilter && statusFilter !== 'Semua') queryParams.append('status', statusFilter);
+      if (jenisPKSFilter && jenisPKSFilter !== 'Semua') queryParams.append('jenis_pks', jenisPKSFilter);
+      if (jenisObjekFilter && jenisObjekFilter !== 'Semua') queryParams.append('jenis_objek', jenisObjekFilter);
+      queryParams.append('format', 'xlsx');
+
+      const filename = `Data_PKS_JasaRaharja_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      
+      // Unduh langsung berkas Excel (.xlsx) dari backend
+      api.download(`/export/pks?${queryParams.toString()}`, filename);
+    } else if (exportType === 'pdf') {
+      // Buka jendela baru untuk Cetak Laporan PDF
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast.warning('Gagal membuka jendela cetak. Mohon izinkan pop-up pada browser Anda.', 'Cetak Terblokir');
+        return;
+      }
+
+      // Baris tabel data PKS
+      const pksRows = filteredPKSList.map((pks, index) => {
+        const statusColor = pks.status === 'Aktif' 
+          ? 'color: #059669; background-color: #ecfdf5; border-color: #10b981;' 
+          : pks.status === 'Segera Berakhir'
+            ? 'color: #d97706; background-color: #fffbeb; border-color: #f59e0b;'
+            : 'color: #dc2626; background-color: #fef2f2; border-color: #ef4444;';
+            
+        return `
+          <tr>
+            <td style="text-align: center; font-family: monospace;">${index + 1}</td>
+            <td>
+              <div style="font-weight: 800; color: #1e293b; font-size: 11px;">${pks.nama_perusahaan}</div>
+              ${pks.alamat_perusahaan ? `<div style="font-size: 9px; color: #64748b; margin-top: 2px; font-weight: normal;">${pks.alamat_perusahaan}</div>` : ''}
+            </td>
+            <td style="font-family: monospace; font-weight: bold; color: #475569; font-size: 10px;">${pks.nomor_pks}</td>
+            <td style="text-align: center;">
+              <span style="background-color: #f1f5f9; color: #334155; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                ${pks.jenis_pks}
+              </span>
+            </td>
+            <td style="text-align: center; color: #475569; font-size: 10px;">${pks.jenis_objek}</td>
+            <td style="color: #475569; font-size: 10px;">${formatDate(pks.tanggal_mulai)}</td>
+            <td style="font-weight: bold; color: #334155; font-size: 10px;">${formatDate(pks.tanggal_berakhir)}</td>
+            <td style="text-align: center;">
+              <span style="font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 6px; border: 1px solid; ${statusColor}">
+                ${pks.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Laporan Data PKS - Jasa Raharja</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+            
+            @page {
+              size: landscape;
+              margin: 15mm;
+            }
+            
+            body {
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              color: #1e293b;
+              margin: 0;
+              padding: 0;
+              background-color: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            
+            .header-container {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 3px double #cbd5e1;
+              padding-bottom: 15px;
+              margin-bottom: 20px;
+            }
+            
+            .logo-section {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+            
+            .logo-bumn {
+              font-size: 11px;
+              font-weight: 700;
+              color: #00829B;
+              letter-spacing: 1px;
+              border-left: 2px solid #cbd5e1;
+              padding-left: 12px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+            }
+            
+            .title-section {
+              text-align: right;
+            }
+            
+            .doc-title {
+              font-size: 18px;
+              font-weight: 800;
+              color: #003b87;
+              margin: 0 0 4px 0;
+              letter-spacing: -0.3px;
+            }
+            
+            .doc-subtitle {
+              font-size: 11px;
+              color: #64748b;
+              font-weight: 500;
+              margin: 0;
+            }
+            
+            .meta-grid {
+              display: grid;
+              grid-template-cols: repeat(4, 1fr);
+              gap: 15px;
+              background-color: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 12px 18px;
+              margin-bottom: 25px;
+              font-size: 11px;
+            }
+            
+            .meta-item {
+              display: flex;
+              flex-direction: column;
+              gap: 2px;
+            }
+            
+            .meta-label {
+              font-weight: 700;
+              color: #94a3b8;
+              text-transform: uppercase;
+              font-size: 9px;
+              letter-spacing: 0.5px;
+            }
+            
+            .meta-value {
+              font-weight: 600;
+              color: #334155;
+            }
+            
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+              font-size: 11px;
+            }
+            
+            th {
+              background-color: #003b87;
+              color: #ffffff;
+              font-weight: 700;
+              text-transform: uppercase;
+              font-size: 9px;
+              letter-spacing: 0.5px;
+              padding: 10px 12px;
+              border: 1px solid #003b87;
+              text-align: left;
+            }
+            
+            th.text-center {
+              text-align: center;
+            }
+            
+            td {
+              padding: 10px 12px;
+              border-bottom: 1px solid #e2e8f0;
+              border-left: 1px solid #f1f5f9;
+              border-right: 1px solid #f1f5f9;
+              vertical-align: middle;
+            }
+            
+            tr:nth-child(even) {
+              background-color: #f8fafc;
+            }
+            
+            tr {
+              break-inside: avoid;
+            }
+            
+            .mengetahui-title {
+              text-align: center;
+              font-size: 11px;
+              font-weight: 600;
+              margin-top: 50px;
+              margin-bottom: 10px;
+              color: #64748b;
+              break-inside: avoid;
+            }
+            
+            .footer-signature {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 10px;
+              font-size: 11px;
+              break-inside: avoid;
+              padding: 0 40px;
+            }
+            
+            .signature-box {
+              text-align: center;
+              width: 280px;
+            }
+            
+            .signature-role {
+              color: #475569;
+              font-weight: 600;
+              min-height: 32px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            
+            .signature-space {
+              height: 55px;
+            }
+            
+            .signature-name {
+              font-weight: 700;
+              color: #1e293b;
+              border-bottom: 1.5px solid #1e293b;
+              padding-bottom: 2px;
+              display: inline-block;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header-container">
+            <div class="logo-section">
+              <img src="${logoJasaRaharja}" alt="Jasa Raharja Logo" style="height: 42px; width: auto;" />
+              <div class="logo-bumn">BUMN UNTUK INDONESIA</div>
+            </div>
+            <div class="title-section">
+              <h1 class="doc-title">LAPORAN DATA PERJANJIAN KERJA SAMA (PKS)</h1>
+              <p class="doc-subtitle">PT Jasa Raharja - Kantor Wilayah Riau</p>
+            </div>
+          </div>
+          
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Tanggal Cetak</span>
+              <span class="meta-value">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Kategori PKS / Objek</span>
+              <span class="meta-value">PKS: ${jenisPKSFilter} | Objek: ${jenisObjekFilter}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Filter Status</span>
+              <span class="meta-value">${statusFilter}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Total Laporan</span>
+              <span class="meta-value">${filteredPKSList.length} Kontrak Terdaftar</span>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 5%;" class="text-center">No</th>
+                <th style="width: 25%;">Nama Perusahaan Mitra</th>
+                <th style="width: 20%;">Nomor Kontrak PKS</th>
+                <th style="width: 10%;" class="text-center">Jenis PKS</th>
+                <th style="width: 10%;" class="text-center">Jenis Objek</th>
+                <th style="width: 10%;">Tanggal Mulai</th>
+                <th style="width: 10%;">Masa Berakhir</th>
+                <th style="width: 10%;" class="text-center">Status PKS</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pksRows}
+            </tbody>
+          </table>
+          
+          <div class="mengetahui-title">Mengetahui,</div>
+          <div class="footer-signature">
+            <div class="signature-box">
+              <div class="signature-role">Kepala Sub Bagian Iuran Wajib</div>
+              <div class="signature-space"></div>
+              <div class="signature-name">Esga Putra Pradana, S.E.</div>
+            </div>
+            
+            <div class="signature-box">
+              <div class="signature-role">Kepala Kantor Wilayah Jasa Raharja Riau</div>
+              <div class="signature-space"></div>
+              <div class="signature-name">Muhammad Hidayat, SE.</div>
+            </div>
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            };
+          </script>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
   };
 
   return (
@@ -297,6 +633,13 @@ export default function DataPKSPage() {
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
+                          <button
+                            onClick={() => handleDeleteClick(pks.id)}
+                            className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-400 transition-colors cursor-pointer"
+                            title="Hapus Data PKS"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -388,6 +731,45 @@ export default function DataPKSPage() {
           pksId={selectedPKSId}
           onClose={() => setIsDetailOpen(false)}
         />
+      )}
+
+      {/* Modal Portal Konfirmasi Hapus PKS (Premium Glassmorphic Style) */}
+      {isDeleteOpen && createPortal(
+        <div className="fixed inset-0 z-[100] overflow-y-auto glass-overlay flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-sm w-full overflow-hidden animate-fade-in p-6 text-center space-y-4">
+            
+            <div className="mx-auto w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 animate-pulse">
+              <Trash2 className="w-5.5 h-5.5" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-extrabold text-slate-800 text-lg">Hapus Kontrak PKS?</h3>
+              <p className="text-xs text-slate-400 font-medium leading-relaxed">
+                Tindakan ini tidak dapat dibatalkan. Berkas PDF kontrak fisik terkait di server juga akan dihapus permanen. Apakah Anda yakin?
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => {
+                  setIsDeleteOpen(false);
+                  setDeletingPKSId(null);
+                }}
+                className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-all cursor-pointer"
+              >
+                Batalkan
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-grow flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-900/10 transition-all cursor-pointer"
+              >
+                Ya, Hapus Data
+              </button>
+            </div>
+
+          </div>
+        </div>,
+        document.body
       )}
 
     </div>

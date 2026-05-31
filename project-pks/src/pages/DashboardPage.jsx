@@ -19,6 +19,7 @@ import PKSPieChart from '../components/dashboard/PKSPieChart';
 import AddPKSModal from '../components/pks/AddPKSModal';
 import EditPKSModal from '../components/pks/EditPKSModal';
 import { api } from '../services/api';
+import { toast } from '../utils/toast';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ export default function DashboardPage() {
       refreshCompanies();
       setIsAddModalOpen(false);
     } catch (err) {
-      alert(err.message || 'Gagal menyimpan PKS baru.');
+      toast.error(err.message || 'Gagal menyimpan PKS baru.');
     }
   };
 
@@ -100,7 +101,7 @@ export default function DashboardPage() {
       await editPKS(selectedPKSId, updatedPKS);
       setIsEditModalOpen(false);
     } catch (err) {
-      alert(err.message || 'Gagal memperbarui data PKS.');
+      toast.error(err.message || 'Gagal memperbarui data PKS.');
     }
   };
 

@@ -13,6 +13,7 @@ import {
   Download,
 } from "lucide-react";
 import { usePKS } from "../../hooks/usePKS";
+import { toast } from "../../utils/toast";
 import { formatDate, formatDateFull } from "../../utils/formatDate";
 import StatusBadge from "../common/StatusBadge";
 import Button from "../common/Button";
@@ -31,7 +32,7 @@ export default function DetailPKSModal({ pksId, onClose }) {
         }
       }).catch(err => {
         console.error('Failed to load PKS details:', err);
-        alert('Gagal memuat detail PKS dari server.');
+        toast.error('Gagal memuat detail PKS dari server.');
       });
     }
   }, [pksId, getPKSById]);
@@ -44,7 +45,7 @@ export default function DetailPKSModal({ pksId, onClose }) {
     if (pks.dokumen_pks_url) {
       window.open(pks.dokumen_pks_url, '_blank');
     } else {
-      alert('Dokumen PDF tidak ditemukan.');
+      toast.error('Dokumen PDF tidak ditemukan.');
     }
   };
 

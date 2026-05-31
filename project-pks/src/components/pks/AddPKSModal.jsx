@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Building, FileText, Upload } from 'lucide-react';
 import Button from '../common/Button';
+import { toast } from '../../utils/toast';
 
 export default function AddPKSModal({ onClose, onSubmit }) {
   // 1. State Informasi Perusahaan
@@ -24,14 +25,27 @@ export default function AddPKSModal({ onClose, onSubmit }) {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      setDocumentFile(e.target.files[0]);
+      const file = e.target.files[0];
+      // Pengecekan instan ukuran file (10MB = 10 * 1024 * 1024 bytes)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Ukuran Berkas Terlalu Besar');
+        e.target.value = ''; // Reset inputan file
+        setDocumentFile(null);
+        return;
+      }
+      setDocumentFile(file);
     }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!namaPerusahaan || !nomorPKS || !judulPKS || !tanggalMulai || !tanggalBerakhir) {
-      alert('Harap isi semua kolom wajib (berlabel bintang *)');
+      toast.warning('Harap isi semua kolom wajib (berlabel bintang *)');
+      return;
+    }
+
+    if (documentFile && documentFile.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Gagal Menyimpan');
       return;
     }
 

@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pks/{id}', [PksController::class, 'show']);
     Route::put('/pks/{id}', [PksController::class, 'update']);
     Route::post('/pks/{id}', [PksController::class, 'update']); // Fallback POST route for multipart/form-data file uploads with PUT method spoofing
+    Route::delete('/pks/{id}', [PksController::class, 'destroy']);
 
     // Company Directory
     Route::get('/perusahaan', [PerusahaanController::class, 'index']);
