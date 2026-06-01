@@ -54,28 +54,22 @@ class ExportController extends Controller
         $format = strtolower($request->query('format', 'csv'));
 
         $headers = [
-            'Nomor PKS', 'Judul PKS', 'Jenis PKS', 'Jenis Objek', 
-            'Tanggal Mulai', 'Tanggal Berakhir', 'Tanggal Addendum', 
-            'Status PKS', 'Nama Perusahaan', 'Nama Pengelola Perusahaan', 
-            'Email Perusahaan', 'Nomor Telepon Perusahaan', 'Alamat Perusahaan'
+            'Nama Perusahaan Mitra', 'Alamat Perusahaan', 'Nomor Kontrak PKS', 
+            'Jenis PKS', 'Jenis Objek', 'Tanggal Mulai', 
+            'Masa Berakhir', 'Status PKS'
         ];
 
         $dataRows = [];
         foreach ($records as $record) {
             $dataRows[] = [
+                $record->perusahaan ? $record->perusahaan->nama_perusahaan : '-',
+                $record->perusahaan ? ($record->perusahaan->alamat ?? '-') : '-',
                 $record->nomor_pks,
-                $record->judul_pks,
                 $record->jenis_pks,
                 $record->jenis_objek,
                 $record->tanggal_mulai,
                 $record->tanggal_berakhir,
-                $record->tanggal_addendum ?? '-',
-                $record->status_pks,
-                $record->perusahaan ? $record->perusahaan->nama_perusahaan : '-',
-                $record->perusahaan ? $record->perusahaan->nama_pengelola : '-',
-                $record->perusahaan ? ($record->perusahaan->email ?? '-') : '-',
-                $record->perusahaan ? $record->perusahaan->nomor_telepon : '-',
-                $record->perusahaan ? $record->perusahaan->alamat : '-'
+                $record->status_pks
             ];
         }
 
@@ -93,7 +87,7 @@ class ExportController extends Controller
      */
     public function exportPerusahaan(Request $request)
     {
-        $query = Perusahaan::withCount('dataPks');
+        $query = Perusahaan::with('dataPks');
 
         // Apply identical search/sort logic as PerusahaanController@index
         if ($request->filled('search')) {
@@ -111,18 +105,35 @@ class ExportController extends Controller
 
         $headers = [
             'Nama Perusahaan', 'Nama Pengelola', 'Alamat', 
-            'Email', 'Nomor Telepon', 'Jumlah PKS Terdaftar', 'Tanggal Terdaftar'
+            'Email', 'Nomor Telepon', 'Status PKS', 'Tanggal Terdaftar'
         ];
 
         $dataRows = [];
         foreach ($records as $record) {
+            $companyPks = $record->dataPks;
+            $overallStatus = 'Tidak Aktif';
+            
+            if ($companyPks->count() > 0) {
+                $statuses = $companyPks->map(function($p) {
+                    return $p->status_pks;
+                })->toArray();
+                
+                if (in_array('Berakhir', $statuses)) {
+                    $overallStatus = 'Berakhir';
+                } elseif (in_array('Segera Berakhir', $statuses)) {
+                    $overallStatus = 'Segera Berakhir';
+                } elseif (in_array('Aktif', $statuses)) {
+                    $overallStatus = 'Aktif';
+                }
+            }
+
             $dataRows[] = [
                 $record->nama_perusahaan,
                 $record->nama_pengelola,
                 $record->alamat,
                 $record->email ?? '-',
                 $record->nomor_telepon,
-                $record->data_pks_count,
+                $overallStatus,
                 $record->created_at->format('Y-m-d H:i:s')
             ];
         }

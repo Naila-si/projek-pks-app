@@ -19,6 +19,7 @@ import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
 import ExportButton from '../components/common/ExportButton';
 import EditCompanyModal from '../components/company/EditCompanyModal';
+import DetailCompanyModal from '../components/company/DetailCompanyModal';
 import { api } from '../services/api';
 import logoJasaRaharja from '../assets/logo_jasa_raharja.png';
 import { toast } from '../utils/toast';
@@ -28,8 +29,9 @@ export default function DataPerusahaanPage() {
   const { companies, refreshCompanies, editCompany } = useCompany();
   const { pksList } = usePKS();
 
-  // State Modal Edit Perusahaan
+  // State Modal Perusahaan
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
 
   // State Filter & Pencarian
@@ -133,6 +135,11 @@ export default function DataPerusahaanPage() {
     return cleanName.slice(0, 2).toUpperCase();
   };
 
+  const handleDetailClick = (id) => {
+    setSelectedCompanyId(id);
+    setIsDetailOpen(true);
+  };
+
   const handleEditClick = (id) => {
     setSelectedCompanyId(id);
     setIsEditOpen(true);
@@ -177,21 +184,24 @@ export default function DataPerusahaanPage() {
               ? 'color: #dc2626; background-color: #fef2f2; border-color: #ef4444;'
               : 'color: #64748b; background-color: #f8fafc; border-color: #cbd5e1;';
               
+        const createdDate = company.created_at 
+          ? new Date(company.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' })
+          : '-';
+
         return `
           <tr>
             <td style="text-align: center; font-family: monospace;">${index + 1}</td>
-            <td>
-              <div style="font-weight: 800; color: #1e293b; font-size: 11px;">${company.nama_perusahaan}</div>
-              ${company.alamat ? `<div style="font-size: 9px; color: #64748b; margin-top: 2px; font-weight: normal;">${company.alamat}</div>` : ''}
-            </td>
+            <td style="font-weight: 800; color: #1e293b; font-size: 11px;">${company.nama_perusahaan}</td>
             <td style="color: #334155; font-size: 10.5px;">${company.nama_pengelola || '-'}</td>
-            <td style="color: #475569; font-size: 10px; font-family: monospace;">${company.telepon || '-'}</td>
-            <td style="text-align: center; font-weight: 700; color: #003b87; font-size: 11px;">${company.pksCount}</td>
+            <td style="color: #64748b; font-size: 10px;">${company.alamat || '-'}</td>
+            <td style="color: #475569; font-size: 10px; font-family: monospace;">${company.email || '-'}</td>
+            <td style="color: #475569; font-size: 10px; font-family: monospace;">${company.telepon || company.nomor_telepon || '-'}</td>
             <td style="text-align: center;">
               <span style="font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 6px; border: 1px solid; ${statusColor}">
                 ${company.statusPKS}
               </span>
             </td>
+            <td style="text-align: center; color: #64748b; font-size: 10px; font-family: monospace;">${createdDate}</td>
           </tr>
         `;
       }).join('');
@@ -206,7 +216,7 @@ export default function DataPerusahaanPage() {
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
             
             @page {
-              size: portrait;
+              size: landscape;
               margin: 15mm;
             }
             
@@ -416,12 +426,14 @@ export default function DataPerusahaanPage() {
           <table>
             <thead>
               <tr>
-                <th style="width: 5%;" class="text-center">No</th>
-                <th style="width: 40%;">Nama Perusahaan Rekanan</th>
-                <th style="width: 20%;">Nama Pengelola</th>
-                <th style="width: 15%;">Kontak Telepon</th>
-                <th style="width: 10%;" class="text-center">Jumlah PKS</th>
-                <th style="width: 10%;" class="text-center">Status PKS</th>
+                <th style="width: 4%;" class="text-center">No</th>
+                <th style="width: 20%;">Nama Perusahaan</th>
+                <th style="width: 13%;">Nama Pengelola</th>
+                <th style="width: 23%;">Alamat</th>
+                <th style="width: 12%;">Email</th>
+                <th style="width: 11%;">Nomor Telepon</th>
+                <th style="width: 9%;" class="text-center">Status PKS</th>
+                <th style="width: 8%;" class="text-center">Tanggal Terdaftar</th>
               </tr>
             </thead>
             <tbody>
@@ -630,7 +642,7 @@ export default function DataPerusahaanPage() {
                       <td className="py-4 px-6 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => navigate(`/perusahaan/${company.id}`)}
+                            onClick={() => handleDetailClick(company.id)}
                             className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-100 hover:bg-[#e8f1fc] hover:text-[#003b87] text-slate-400 transition-colors cursor-pointer"
                             title="Lihat Profil Detail Perusahaan & Riwayat PKS"
                           >
@@ -708,6 +720,14 @@ export default function DataPerusahaanPage() {
           companyId={selectedCompanyId}
           onClose={() => setIsEditOpen(false)}
           onSubmit={handleEditSubmit}
+        />
+      )}
+
+      {/* Modal Detail Profil Perusahaan */}
+      {isDetailOpen && (
+        <DetailCompanyModal
+          companyId={selectedCompanyId}
+          onClose={() => setIsDetailOpen(false)}
         />
       )}
 

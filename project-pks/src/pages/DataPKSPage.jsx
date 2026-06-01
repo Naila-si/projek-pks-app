@@ -187,10 +187,8 @@ export default function DataPKSPage() {
         return `
           <tr>
             <td style="text-align: center; font-family: monospace;">${index + 1}</td>
-            <td>
-              <div style="font-weight: 800; color: #1e293b; font-size: 11px;">${pks.nama_perusahaan}</div>
-              ${pks.alamat_perusahaan ? `<div style="font-size: 9px; color: #64748b; margin-top: 2px; font-weight: normal;">${pks.alamat_perusahaan}</div>` : ''}
-            </td>
+            <td style="font-weight: 800; color: #1e293b; font-size: 11px;">${pks.nama_perusahaan}</td>
+            <td style="color: #64748b; font-size: 10px;">${pks.alamat_perusahaan || '-'}</td>
             <td style="font-family: monospace; font-weight: bold; color: #475569; font-size: 10px;">${pks.nomor_pks}</td>
             <td style="text-align: center;">
               <span style="background-color: #f1f5f9; color: #334155; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
@@ -429,14 +427,15 @@ export default function DataPKSPage() {
           <table>
             <thead>
               <tr>
-                <th style="width: 5%;" class="text-center">No</th>
-                <th style="width: 25%;">Nama Perusahaan Mitra</th>
-                <th style="width: 20%;">Nomor Kontrak PKS</th>
-                <th style="width: 10%;" class="text-center">Jenis PKS</th>
-                <th style="width: 10%;" class="text-center">Jenis Objek</th>
-                <th style="width: 10%;">Tanggal Mulai</th>
-                <th style="width: 10%;">Masa Berakhir</th>
-                <th style="width: 10%;" class="text-center">Status PKS</th>
+                <th style="width: 4%;" class="text-center">No</th>
+                <th style="width: 20%;">Nama Perusahaan</th>
+                <th style="width: 23%;">Alamat Perusahaan</th>
+                <th style="width: 15%;">Nomor Kontrak PKS</th>
+                <th style="width: 8%;" class="text-center">Jenis PKS</th>
+                <th style="width: 8%;" class="text-center">Jenis Objek</th>
+                <th style="width: 8%;">Tanggal Mulai</th>
+                <th style="width: 8%;">Masa Berakhir</th>
+                <th style="width: 8%;" class="text-center">Status PKS</th>
               </tr>
             </thead>
             <tbody>
