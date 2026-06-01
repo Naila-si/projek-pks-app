@@ -91,14 +91,18 @@ export default function DataPKSPage() {
   }, [filteredPKSList, startIndex]);
 
   // Penanganan Modal Tambah PKS
-  const handleAddPKSSubmit = async (pksData, companyData) => {
-    try {
-      await addPKS(pksData, companyData);
+  const handleAddPKSSubmit = (pksData, companyData) => {
+    // Tutup modal secara instan & tampilkan notifikasi sukses
+    setIsAddOpen(false);
+    toast.success('Data PKS baru berhasil ditambahkan.', 'Berhasil');
+    
+    // Kirim data ke backend di background
+    addPKS(pksData, companyData).then(() => {
       refreshCompanies();
-      setIsAddOpen(false);
-    } catch (err) {
+    }).catch(err => {
       toast.error(err.message || 'Gagal menyimpan PKS baru.');
-    }
+      refreshPKS();
+    });
   };
 
   // Penanganan Modal Edit PKS
@@ -107,13 +111,16 @@ export default function DataPKSPage() {
     setIsEditOpen(true);
   };
 
-  const handleEditPKSSubmit = async (updatedPKS) => {
-    try {
-      await editPKS(selectedPKSId, updatedPKS);
-      setIsEditOpen(false);
-    } catch (err) {
+  const handleEditPKSSubmit = (updatedPKS) => {
+    // Tutup modal secara instan & tampilkan notifikasi sukses
+    setIsEditOpen(false);
+    toast.success('Perubahan data PKS berhasil disimpan.', 'Berhasil');
+    
+    // Kirim data ke backend di background
+    editPKS(selectedPKSId, updatedPKS).catch(err => {
       toast.error(err.message || 'Gagal memperbarui data PKS.');
-    }
+      refreshPKS();
+    });
   };
 
   // Penanganan Modal Detail PKS

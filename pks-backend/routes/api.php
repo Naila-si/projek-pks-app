@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pks', [PksController::class, 'index']);
     Route::post('/pks', [PksController::class, 'store']);
     Route::get('/pks/{id}', [PksController::class, 'show']);
+    Route::get('/pks/{id}/download', [PksController::class, 'downloadDokumen']);
     Route::put('/pks/{id}', [PksController::class, 'update']);
     Route::post('/pks/{id}', [PksController::class, 'update']); // Fallback POST route for multipart/form-data file uploads with PUT method spoofing
     Route::delete('/pks/{id}', [PksController::class, 'destroy']);

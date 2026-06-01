@@ -81,14 +81,17 @@ export default function DashboardPage() {
     }));
   }, [stats.daftar_pks_segera_berakhir]);
 
-  const handleAddPKSSubmit = async (pksData, companyData) => {
-    try {
-      await addPKS(pksData, companyData);
+  const handleAddPKSSubmit = (pksData, companyData) => {
+    // Tutup modal secara instan & tampilkan notifikasi sukses
+    setIsAddModalOpen(false);
+    toast.success('Data PKS baru berhasil ditambahkan.', 'Berhasil');
+    
+    // Kirim data ke backend di background
+    addPKS(pksData, companyData).then(() => {
       refreshCompanies();
-      setIsAddModalOpen(false);
-    } catch (err) {
+    }).catch(err => {
       toast.error(err.message || 'Gagal menyimpan PKS baru.');
-    }
+    });
   };
 
   const handleEditClick = (id) => {
@@ -96,13 +99,15 @@ export default function DashboardPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleEditPKSSubmit = async (updatedPKS) => {
-    try {
-      await editPKS(selectedPKSId, updatedPKS);
-      setIsEditModalOpen(false);
-    } catch (err) {
+  const handleEditPKSSubmit = (updatedPKS) => {
+    // Tutup modal secara instan & tampilkan notifikasi sukses
+    setIsEditModalOpen(false);
+    toast.success('Perubahan data PKS berhasil disimpan.', 'Berhasil');
+    
+    // Kirim data ke backend di background
+    editPKS(selectedPKSId, updatedPKS).catch(err => {
       toast.error(err.message || 'Gagal memperbarui data PKS.');
-    }
+    });
   };
 
   const cardsInfo = [
@@ -230,7 +235,7 @@ export default function DashboardPage() {
       <div className="bg-white border border-slate-100 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden">
         <div className="px-6 py-5 border-b border-slate-50 flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h3 className="font-bold text-slate-800 text-base">PKS Akan Habis</h3>
+            <h3 className="font-bold text-slate-800 text-base">PKS Yang Akan Segera Berakhir</h3>
             <p className="text-xs text-slate-400 font-medium mt-0.5">Segera lakukan perpanjangan untuk menjaga kelancaran operasional mitra.</p>
           </div>
           

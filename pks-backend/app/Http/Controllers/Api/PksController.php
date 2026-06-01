@@ -195,4 +195,30 @@ class PksController extends Controller
             'message' => 'Data PKS berhasil dihapus.'
         ], 200);
     }
+
+    /**
+     * Download or view the PKS PDF document securely.
+     */
+    public function downloadDokumen($id)
+    {
+        $pks = DataPKS::findOrFail($id);
+
+        if (!$pks->dokumen_pks) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dokumen PKS tidak ditemukan.'
+            ], 404);
+        }
+
+        $filePath = 'public/pks/' . $pks->dokumen_pks;
+
+        if (!Storage::exists($filePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Berkas PKS tidak ditemukan di server.'
+            ], 404);
+        }
+
+        return Storage::response($filePath);
+    }
 }

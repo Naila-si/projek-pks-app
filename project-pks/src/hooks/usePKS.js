@@ -90,7 +90,10 @@ export function usePKS() {
       }
 
       const response = await api.post('/pks', formData);
-      await refreshPKS();
+      if (response.success && response.data) {
+        setPksList(prev => [response.data, ...prev]);
+      }
+      refreshPKS(); // Trigger background sync
       return response;
     } catch (err) {
       console.error('Create PKS failed:', err);
@@ -133,7 +136,10 @@ export function usePKS() {
       }
 
       const response = await api.post(`/pks/${id}`, formData);
-      await refreshPKS();
+      if (response.success && response.data) {
+        setPksList(prev => prev.map(p => (p.id_pks === id || p.id === id) ? response.data : p));
+      }
+      refreshPKS(); // Trigger background sync
       return response;
     } catch (err) {
       console.error('Update PKS failed:', err);

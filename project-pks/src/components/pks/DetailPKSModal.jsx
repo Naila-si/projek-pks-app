@@ -22,6 +22,7 @@ export default function DetailPKSModal({ pksId, onClose }) {
   const { getPKSById } = usePKS();
   const [pks, setPks] = useState(null);
   const [company, setCompany] = useState(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (pksId) {
@@ -41,11 +42,48 @@ export default function DetailPKSModal({ pksId, onClose }) {
 
   const status = pks.status_pks;
 
-  const handleDownload = () => {
-    if (pks.dokumen_pks_url) {
-      window.open(pks.dokumen_pks_url, '_blank');
-    } else {
-      toast.error('Dokumen PDF tidak ditemukan.');
+  const handleDownload = async () => {
+    const pksIdValue = pks?.id_pks || pks?.id;
+    if (!pks || !pksIdValue) {
+      toast.error('Data PKS tidak lengkap.');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      const token = localStorage.getItem('pks_auth_token');
+      
+      const response = await fetch(`http://127.0.0.1:8000/api/pks/${pksIdValue}/download`, {
+        method: 'GET',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Berkas PDF tidak ditemukan di server.');
+        } else if (response.status === 403) {
+          throw new Error('Anda tidak memiliki akses untuk berkas ini.');
+        } else {
+          throw new Error('Gagal mengunduh berkas dari server.');
+        }
+      }
+
+      const blob = await response.blob();
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const downloadUrl = window.URL.createObjectURL(pdfBlob);
+      
+      // Open in a new tab for previewing and downloading
+      window.open(downloadUrl, '_blank');
+      
+      toast.success('Berkas PDF berhasil dimuat.');
+    } catch (err) {
+      console.error('Download error:', err);
+      toast.error(err.message || 'Gagal memuat berkas PKS dari server.');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -194,7 +232,7 @@ export default function DetailPKSModal({ pksId, onClose }) {
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2 text-slate-600">
                     <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                    <span>{company.telepon || "-"}</span>
+                    <span>{company.nomor_telepon || company.telepon || "-"}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600">
                     <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
@@ -217,8 +255,9 @@ export default function DetailPKSModal({ pksId, onClose }) {
             variant="outline"
             onClick={handleDownload}
             icon={Download}
+            disabled={isDownloading}
           >
-            Unduh Berkas PKS (.pdf)
+            {isDownloading ? 'Memuat PDF...' : 'Unduh Berkas PKS (.pdf)'}
           </Button>
 
           <Button variant="primary" onClick={onClose}>
