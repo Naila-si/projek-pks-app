@@ -52,14 +52,9 @@ export default function NotifikasiPage() {
     // Tandai dibaca saat diklik aksinya
     markAsRead(notif.id_notifikasi);
     
-    if (notif.aksi_tipe === 'perusahaan') {
-      // Perpanjang -> Arahkan ke Detail Perusahaan
-      navigate(`/perusahaan/${notif.aksi_id}`);
-    } else {
-      // Tinjau Data -> Tampilkan Detail PKS Modal
-      setSelectedPKSId(notif.aksi_id);
-      setIsPKSDetailOpen(true);
-    }
+    // Tinjau Data atau Perpanjang -> Tampilkan Detail PKS Modal menggunakan id_pks
+    setSelectedPKSId(notif.id_pks);
+    setIsPKSDetailOpen(true);
   };
 
   const handleMarkAllRead = () => {

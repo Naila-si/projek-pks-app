@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Notifications History
     Route::get('/notifikasi', [NotifikasiController::class, 'index']);
+    Route::put('/notifikasi/{id}/read', [NotifikasiController::class, 'markAsRead']);
 
     // Data Exports (Excel / CSV)
     Route::get('/export/pks', [ExportController::class, 'exportPks']);

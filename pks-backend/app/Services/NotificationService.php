@@ -22,6 +22,11 @@ class NotificationService
             $companyName = $pks->perusahaan ? $pks->perusahaan->nama_perusahaan : 'Perusahaan Tidak Ditemukan';
 
             if ($status === 'Segera Berakhir') {
+                // Delete "Berakhir" notification if it exists (reverted status)
+                Notifikasi::where('id_pks', $pks->id_pks)
+                    ->where('pesan', 'like', '%telah berakhir%')
+                    ->delete();
+
                 $pesan = "Perjanjian Kerja Sama {$pks->judul_pks} dengan {$companyName} akan segera berakhir pada {$pks->tanggal_berakhir}.";
                 
                 // Check if a "Segera Berakhir" notification already exists for this PKS
@@ -38,6 +43,11 @@ class NotificationService
                     ]);
                 }
             } elseif ($status === 'Berakhir') {
+                // Delete "Segera Berakhir" notification if it exists (moved to expired)
+                Notifikasi::where('id_pks', $pks->id_pks)
+                    ->where('pesan', 'like', '%akan segera berakhir%')
+                    ->delete();
+
                 $pesan = "Perjanjian Kerja Sama {$pks->judul_pks} dengan {$companyName} telah berakhir pada {$pks->tanggal_berakhir}.";
 
                 // Check if a "Berakhir" notification already exists for this PKS
@@ -53,6 +63,9 @@ class NotificationService
                         'status_baca' => false,
                     ]);
                 }
+            } else {
+                // Status is "Aktif", delete any warning notifications since PKS is renewed or active
+                Notifikasi::where('id_pks', $pks->id_pks)->delete();
             }
         }
     }

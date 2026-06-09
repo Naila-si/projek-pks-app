@@ -11,18 +11,40 @@ import {
   Eye,
   ArrowRight,
   Download,
+  Edit,
 } from "lucide-react";
 import { usePKS } from "../../hooks/usePKS";
 import { toast } from "../../utils/toast";
 import { formatDate, formatDateFull } from "../../utils/formatDate";
 import StatusBadge from "../common/StatusBadge";
 import Button from "../common/Button";
+import EditPKSModal from "./EditPKSModal";
 
 export default function DetailPKSModal({ pksId, onClose }) {
-  const { getPKSById } = usePKS();
+  const { getPKSById, editPKS } = usePKS();
   const [pks, setPks] = useState(null);
   const [company, setCompany] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const handleEditSubmit = (updatedPKS) => {
+    const pksIdValue = pks?.id_pks || pks?.id;
+    editPKS(pksIdValue, updatedPKS)
+      .then(response => {
+        if (response.success && response.data) {
+          toast.success('Data PKS berhasil diperbarui.');
+          setPks(response.data);
+          if (response.data.perusahaan) {
+            setCompany(response.data.perusahaan);
+          }
+          setIsEditOpen(false);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to update PKS:', err);
+        toast.error(err.message || 'Gagal memperbarui data PKS.');
+      });
+  };
 
   useEffect(() => {
     if (pksId) {
@@ -260,11 +282,28 @@ export default function DetailPKSModal({ pksId, onClose }) {
             {isDownloading ? 'Memuat PDF...' : 'Unduh Berkas PKS (.pdf)'}
           </Button>
 
-          <Button variant="primary" onClick={onClose}>
-            Tutup Detail
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              icon={Edit}
+              className="border-blue-200 text-[#003b87] hover:bg-blue-50/50"
+              onClick={() => setIsEditOpen(true)}
+            >
+              Perbarui Data PKS
+            </Button>
+            <Button variant="primary" onClick={onClose}>
+              Tutup Detail
+            </Button>
+          </div>
         </div>
       </div>
+      {isEditOpen && (
+        <EditPKSModal
+          pksId={pks?.id_pks || pks?.id}
+          onClose={() => setIsEditOpen(false)}
+          onSubmit={handleEditSubmit}
+        />
+      )}
     </div>,
     document.body,
   );

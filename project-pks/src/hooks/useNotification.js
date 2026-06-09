@@ -28,14 +28,25 @@ export function useNotification() {
   }, []);
 
   /**
-   * Mark a notification as read (simulated local toggle for the UI session,
-   * keeping the client-side state responsive since no server endpoint is requested).
+   * Mark a notification as read (permanently stored in backend database,
+   * with optimistic local toggle for responsive UI).
    */
-  const markAsRead = useCallback((id) => {
+  const markAsRead = useCallback(async (id) => {
+    // 1. Optimistic UI update
     setNotifications(prev => 
       prev.map(n => n.id_notifikasi === id ? { ...n, status_baca: true } : n)
     );
-    return true;
+
+    // 2. Persist in database in background
+    try {
+      await api.put(`/notifikasi/${id}/read`, {});
+    } catch (err) {
+      console.error('Failed to mark notification as read in database:', err);
+      // Revert state if API call failed
+      setNotifications(prev => 
+        prev.map(n => n.id_notifikasi === id ? { ...n, status_baca: false } : n)
+      );
+    }
   }, []);
 
   /**

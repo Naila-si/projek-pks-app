@@ -29,4 +29,20 @@ class NotifikasiController extends Controller
             'data' => NotifikasiResource::collection($notifications)
         ], 200);
     }
+
+    /**
+     * Mark a notification as read.
+     */
+    public function markAsRead($id)
+    {
+        $notification = Notifikasi::findOrFail($id);
+        $notification->status_baca = true;
+        $notification->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi berhasil ditandai sebagai dibaca.',
+            'data' => new NotifikasiResource($notification)
+        ], 200);
+    }
 }

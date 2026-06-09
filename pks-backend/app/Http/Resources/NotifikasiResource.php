@@ -46,6 +46,8 @@ class NotifikasiResource extends JsonResource
             'id_notifikasi' => $this->id_notifikasi,
             'id_pks' => $this->id_pks,
             'pesan' => $this->pesan,
+            'nomor_pks' => $pks ? $pks->nomor_pks : null,
+            'tanggal_berakhir' => $tanggalBerakhir,
             'tanggal_notifikasi' => $this->tanggal_notifikasi ? $this->tanggal_notifikasi->format('Y-m-d') : null,
             'status_baca' => $this->status_baca,
             'created_at' => $this->created_at,
