@@ -116,15 +116,14 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
             
             {/* Nomor PKS */}
             <div className="space-y-1.5 sm:col-span-2">
-              <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Nomor Surat PKS <span className="text-rose-500">*</span>
+              <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                Nomor Surat PKS <span className="text-slate-400 font-normal">(Tidak dapat diubah)</span>
               </label>
               <input
                 type="text"
-                required
+                disabled
                 value={nomorPKS}
-                onChange={(e) => setNomorPKS(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-400 cursor-not-allowed focus:outline-none"
               />
             </div>
 

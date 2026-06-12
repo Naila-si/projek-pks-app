@@ -14,7 +14,6 @@ export default function AddPKSModal({ onClose, onSubmit }) {
   const [telepon, setTelepon] = useState('');
 
   // 2. State Informasi PKS
-  const [nomorPKS, setNomorPKS] = useState('');
   const [judulPKS, setJudulPKS] = useState('');
   const [bidang, setBidang] = useState('IW');
   const [tanggalMulai, setTanggalMulai] = useState('');
@@ -38,7 +37,7 @@ export default function AddPKSModal({ onClose, onSubmit }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!namaPerusahaan || !nomorPKS || !judulPKS || !tanggalMulai || !tanggalBerakhir) {
+    if (!namaPerusahaan || !judulPKS || !tanggalMulai || !tanggalBerakhir) {
       toast.warning('Harap isi semua kolom wajib (berlabel bintang *)');
       return;
     }
@@ -57,7 +56,7 @@ export default function AddPKSModal({ onClose, onSubmit }) {
     };
 
     const pksData = {
-      nomor_pks: nomorPKS,
+      nomor_pks: '',
       judul_pks: judulPKS,
       bidang: bidang,
       tanggal_mulai: tanggalMulai,
@@ -184,20 +183,6 @@ export default function AddPKSModal({ onClose, onSubmit }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Nomor PKS */}
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                  Nomor Surat PKS <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: PKS/2026/XI/0042"
-                  value={nomorPKS}
-                  onChange={(e) => setNomorPKS(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
-                />
-              </div>
 
               {/* Judul PKS */}
               <div className="space-y-1.5">

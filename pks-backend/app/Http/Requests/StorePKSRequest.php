@@ -23,7 +23,7 @@ class StorePKSRequest extends FormRequest
     {
         return [
             // PKS Attributes
-            'nomor_pks' => 'required|string|max:100|unique:data_pks,nomor_pks',
+            'nomor_pks' => 'nullable|string|max:100|unique:data_pks,nomor_pks',
             'judul_pks' => 'required|string|max:255',
             'bidang' => 'required|in:IW,SW,pelayanan,umum,HC,keuangan,tjsl',
             'tanggal_mulai' => 'required|date',

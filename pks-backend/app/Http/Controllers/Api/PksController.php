@@ -69,18 +69,6 @@ class PksController extends Controller
     {
         $id_perusahaan = $request->id_perusahaan;
 
-        // If id_perusahaan is not provided, create a new company profile on the fly
-        if (!$id_perusahaan) {
-            $perusahaan = Perusahaan::create([
-                'nama_perusahaan' => $request->nama_perusahaan,
-                'nama_pengelola' => $request->nama_pengelola,
-                'alamat' => $request->alamat,
-                'email' => $request->email,
-                'nomor_telepon' => $request->nomor_telepon,
-            ]);
-            $id_perusahaan = $perusahaan->id_perusahaan;
-        }
-
         // Upload PKS Document (PDF)
         $filename = null;
         if ($request->hasFile('dokumen_pks')) {
@@ -89,16 +77,55 @@ class PksController extends Controller
             $file->storeAs('public/pks', $filename);
         }
 
-        $pks = DataPKS::create([
-            'nomor_pks' => $request->nomor_pks,
-            'judul_pks' => $request->judul_pks,
-            'bidang' => $request->bidang,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_berakhir' => $request->tanggal_berakhir,
-            'tanggal_addendum' => $request->tanggal_addendum,
-            'dokumen_pks' => $filename,
-            'id_perusahaan' => $id_perusahaan,
-        ]);
+        // Generate PKS number atomically inside a transaction with update lock
+        $pks = \DB::transaction(function() use ($request, $filename, &$id_perusahaan) {
+            // If id_perusahaan is not provided, create a new company profile on the fly
+            if (!$id_perusahaan) {
+                $perusahaan = Perusahaan::create([
+                    'nama_perusahaan' => $request->nama_perusahaan,
+                    'nama_pengelola' => $request->nama_pengelola,
+                    'alamat' => $request->alamat,
+                    'email' => $request->email,
+                    'nomor_telepon' => $request->nomor_telepon,
+                ]);
+                $id_perusahaan = $perusahaan->id_perusahaan;
+            }
+
+            $nomorPks = $request->nomor_pks;
+
+            if (empty($nomorPks)) {
+                // Determine the year of the contract (based on tanggal_mulai)
+                $year = Carbon::parse($request->tanggal_mulai)->year;
+
+                // Find the latest PKS in the current year using write lock (prevent duplicate sequences)
+                $latestPks = DataPKS::where('nomor_pks', 'like', "P/%/SP/{$year}")
+                    ->lockForUpdate()
+                    ->orderByRaw("CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(nomor_pks, '/', 2), '/', -1) AS UNSIGNED) DESC")
+                    ->first();
+
+                $nextSequence = 1;
+                if ($latestPks) {
+                    $parts = explode('/', $latestPks->nomor_pks);
+                    if (count($parts) >= 2) {
+                        $nextSequence = (int)$parts[1] + 1;
+                    }
+                }
+
+                $formattedSequence = str_pad($nextSequence, 3, '0', STR_PAD_LEFT);
+                $nomorPks = "P/{$formattedSequence}/SP/{$year}";
+            }
+
+            return DataPKS::create([
+                'nomor_pks' => $nomorPks,
+                'judul_pks' => $request->judul_pks,
+                'bidang' => $request->bidang,
+                'tanggal_mulai' => $request->tanggal_mulai,
+                'tanggal_berakhir' => $request->tanggal_berakhir,
+                'tanggal_addendum' => $request->tanggal_addendum,
+                'dokumen_pks' => $filename,
+                'id_perusahaan' => $id_perusahaan,
+            ]);
+        });
 
         return response()->json([
             'success' => true,
