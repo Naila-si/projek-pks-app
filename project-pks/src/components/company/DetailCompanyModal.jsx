@@ -151,7 +151,7 @@ export default function DetailCompanyModal({ companyId, onClose }) {
                         <div className="space-y-1 min-w-0">
                           <span className="font-mono text-xs font-bold text-slate-800 block truncate">{pks.nomor_pks}</span>
                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                            {pks.jenis_pks} • S/D {formatDate(pks.tanggal_berakhir)}
+                            {pks.bidang} • S/D {formatDate(pks.tanggal_berakhir)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">

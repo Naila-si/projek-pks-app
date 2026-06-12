@@ -28,12 +28,8 @@ class ExportController extends Controller
             });
         }
 
-        if ($request->filled('jenis_pks')) {
-            $query->where('jenis_pks', $request->jenis_pks);
-        }
-
-        if ($request->filled('jenis_objek')) {
-            $query->where('jenis_objek', $request->jenis_objek);
+        if ($request->filled('bidang')) {
+            $query->where('bidang', $request->bidang);
         }
 
         if ($request->filled('status')) {
@@ -55,7 +51,7 @@ class ExportController extends Controller
 
         $headers = [
             'Nama Perusahaan Mitra', 'Alamat Perusahaan', 'Nomor Kontrak PKS', 
-            'Jenis PKS', 'Jenis Objek', 'Tanggal Mulai', 
+            'Bidang', 'Tanggal Mulai', 
             'Masa Berakhir', 'Status PKS'
         ];
 
@@ -65,8 +61,7 @@ class ExportController extends Controller
                 $record->perusahaan ? $record->perusahaan->nama_perusahaan : '-',
                 $record->perusahaan ? ($record->perusahaan->alamat ?? '-') : '-',
                 $record->nomor_pks,
-                $record->jenis_pks,
-                $record->jenis_objek,
+                $record->bidang,
                 $record->tanggal_mulai,
                 $record->tanggal_berakhir,
                 $record->status_pks

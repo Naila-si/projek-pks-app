@@ -181,7 +181,7 @@ export default function DetailPerusahaanPage() {
                     <thead>
                       <tr className="bg-slate-50 text-[10px] font-bold text-slate-400 tracking-wider uppercase border-b border-slate-100">
                         <th className="py-4 px-6">Nomor PKS</th>
-                        <th className="py-4 px-6 text-center">Jenis PKS</th>
+                        <th className="py-4 px-6 text-center">Bidang</th>
                         <th className="py-4 px-6">Mulai Berlaku</th>
                         <th className="py-4 px-6">Berakhir Berlaku</th>
                         <th className="py-4 px-6">Status</th>
@@ -196,7 +196,7 @@ export default function DetailPerusahaanPage() {
                             <td className="py-4 px-6 font-mono text-slate-800 font-bold">{pks.nomor_pks}</td>
                             <td className="py-4 px-6 text-center">
                               <span className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">
-                                {pks.jenis_pks}
+                                {pks.bidang}
                               </span>
                             </td>
                             <td className="py-4 px-6 text-slate-500">{formatDate(pks.tanggal_mulai)}</td>

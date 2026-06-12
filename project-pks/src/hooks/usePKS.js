@@ -24,12 +24,8 @@ export function usePKS() {
         queryParams.append('status', filters.status);
       }
       
-      if (filters.jenis_pks && filters.jenis_pks !== 'Semua') {
-        queryParams.append('jenis_pks', filters.jenis_pks);
-      }
-      
-      if (filters.jenis_objek && filters.jenis_objek !== 'Semua') {
-        queryParams.append('jenis_objek', filters.jenis_objek);
+      if (filters.bidang && filters.bidang !== 'Semua') {
+        queryParams.append('bidang', filters.bidang);
       }
 
       const queryString = queryParams.toString();
@@ -59,8 +55,7 @@ export function usePKS() {
       // PKS attributes
       formData.append('nomor_pks', pksData.nomor_pks);
       formData.append('judul_pks', pksData.judul_pks);
-      formData.append('jenis_pks', pksData.jenis_pks);
-      formData.append('jenis_objek', pksData.jenis_objek);
+      formData.append('bidang', pksData.bidang);
       formData.append('tanggal_mulai', pksData.tanggal_mulai);
       formData.append('tanggal_berakhir', pksData.tanggal_berakhir);
       
@@ -118,8 +113,7 @@ export function usePKS() {
       
       formData.append('nomor_pks', pksData.nomor_pks);
       formData.append('judul_pks', pksData.judul_pks);
-      formData.append('jenis_pks', pksData.jenis_pks);
-      formData.append('jenis_objek', pksData.jenis_objek);
+      formData.append('bidang', pksData.bidang);
       formData.append('tanggal_mulai', pksData.tanggal_mulai);
       formData.append('tanggal_berakhir', pksData.tanggal_berakhir);
       formData.append('id_perusahaan', pksData.id_perusahaan || pksData.perusahaan_id);

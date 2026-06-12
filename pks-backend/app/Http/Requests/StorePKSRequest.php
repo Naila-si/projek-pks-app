@@ -25,8 +25,7 @@ class StorePKSRequest extends FormRequest
             // PKS Attributes
             'nomor_pks' => 'required|string|max:100|unique:data_pks,nomor_pks',
             'judul_pks' => 'required|string|max:255',
-            'jenis_pks' => 'required|in:IWKBU,IWKL',
-            'jenis_objek' => 'required|in:Kendaraan,Kapal',
+            'bidang' => 'required|in:IW,SW,pelayanan,umum,HC,keuangan,tjsl',
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
             'tanggal_addendum' => 'nullable|date',

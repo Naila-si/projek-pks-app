@@ -36,9 +36,15 @@ class DashboardController extends Controller
         // Active (remaining days > 30)
         $totalPksAktif = DataPKS::where('tanggal_berakhir', '>', $soonThreshold)->count();
 
-        // Jenis PKS Distribution (IWKBU vs IWKL)
-        $totalIwkbu = DataPKS::where('jenis_pks', 'IWKBU')->count();
-        $totalIwkl = DataPKS::where('jenis_pks', 'IWKL')->count();
+        // Bidang PKS Distribution
+        $daftarBidang = ['IW', 'SW', 'pelayanan', 'umum', 'HC', 'keuangan', 'tjsl'];
+        $dataGrafikBidang = [];
+        foreach ($daftarBidang as $b) {
+            $dataGrafikBidang[] = [
+                'bidang' => $b,
+                'jumlah' => DataPKS::where('bidang', $b)->count()
+            ];
+        }
 
         // List of PKS that are ending soon (eager load perusahaan for the dashboard table)
         $pksSegeraBerakhirList = DataPKS::with('perusahaan')
@@ -57,10 +63,7 @@ class DashboardController extends Controller
                 'total_pks_aktif' => $totalPksAktif,
                 
                 // Chart datasets for easy rendering on frontend
-                'data_grafik_jenis_pks' => [
-                    ['jenis' => 'IWKBU', 'jumlah' => $totalIwkbu],
-                    ['jenis' => 'IWKL', 'jumlah' => $totalIwkl]
-                ],
+                'data_grafik_bidang_pks' => $dataGrafikBidang,
                 'data_grafik_status_pks' => [
                     ['status' => 'Aktif', 'jumlah' => $totalPksAktif],
                     ['status' => 'Segera Berakhir', 'jumlah' => $totalPksSegeraBerakhir],

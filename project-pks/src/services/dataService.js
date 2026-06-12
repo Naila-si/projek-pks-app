@@ -145,8 +145,7 @@ export const dataService = {
       nomor_pks: pksData.nomor_pks,
       judul_pks: pksData.judul_pks,
       perusahaan_id: companyId,
-      jenis_pks: pksData.jenis_pks,
-      jenis_objek: pksData.jenis_objek,
+      bidang: pksData.bidang,
       tanggal_mulai: pksData.tanggal_mulai,
       tanggal_berakhir: pksData.tanggal_berakhir,
       tanggal_addendum: pksData.tanggal_addendum || null,
@@ -235,9 +234,16 @@ export const dataService = {
       else if (status === 'Aktif') totalAktif++;
     });
     
-    // Hitung PKS berdasarkan jenis untuk chart
-    let iwkbuCount = pksList.filter(p => p.jenis_pks === 'IWKBU').length;
-    let iwklCount = pksList.filter(p => p.jenis_pks === 'IWKL').length;
+    // Hitung PKS berdasarkan bidang untuk chart
+    let chartData = {
+      IW: pksList.filter(p => p.bidang === 'IW').length,
+      SW: pksList.filter(p => p.bidang === 'SW').length,
+      pelayanan: pksList.filter(p => p.bidang === 'pelayanan').length,
+      umum: pksList.filter(p => p.bidang === 'umum').length,
+      HC: pksList.filter(p => p.bidang === 'HC').length,
+      keuangan: pksList.filter(p => p.bidang === 'keuangan').length,
+      tjsl: pksList.filter(p => p.bidang === 'tjsl').length
+    };
     
     return {
       totalPKS,
@@ -245,10 +251,7 @@ export const dataService = {
       totalSegeraBerakhir,
       totalBerakhir,
       totalAktif,
-      chartData: {
-        iwkbu: iwkbuCount,
-        iwkl: iwklCount
-      }
+      chartData
     };
   }
 };

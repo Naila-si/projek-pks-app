@@ -173,24 +173,14 @@ export default function DetailPKSModal({ pksId, onClose }) {
                   </p>
                 </div>
 
-                {/* Jenis PKS & Objek */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Kategori PKS
-                    </span>
-                    <p className="text-slate-800 font-extrabold text-sm">
-                      {pks.jenis_pks}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Jenis Objek
-                    </span>
-                    <p className="text-slate-800 font-extrabold text-sm">
-                      {pks.jenis_objek}
-                    </p>
-                  </div>
+                {/* Bidang */}
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    Bidang PKS
+                  </span>
+                  <p className="text-slate-800 font-extrabold text-sm">
+                    {pks.bidang}
+                  </p>
                 </div>
 
                 {/* Periode Berlaku */}

@@ -32,9 +32,14 @@ export default function DashboardPage() {
     total_pks_segera_berakhir: 0,
     total_pks_berakhir: 0,
     total_pks_aktif: 0,
-    data_grafik_jenis_pks: [
-      { jenis: 'IWKBU', jumlah: 0 },
-      { jenis: 'IWKL', jumlah: 0 }
+    data_grafik_bidang_pks: [
+      { bidang: 'IW', jumlah: 0 },
+      { bidang: 'SW', jumlah: 0 },
+      { bidang: 'pelayanan', jumlah: 0 },
+      { bidang: 'umum', jumlah: 0 },
+      { bidang: 'HC', jumlah: 0 },
+      { bidang: 'keuangan', jumlah: 0 },
+      { bidang: 'tjsl', jumlah: 0 }
     ],
     data_grafik_status_pks: [
       { status: 'Aktif', jumlah: 0 },
@@ -146,8 +151,7 @@ export default function DashboardPage() {
   ];
 
   // Resolve counts for the charts
-  const iwkbuCount = stats.data_grafik_jenis_pks.find(item => item.jenis === 'IWKBU')?.jumlah || 0;
-  const iwklCount = stats.data_grafik_jenis_pks.find(item => item.jenis === 'IWKL')?.jumlah || 0;
+  const bidangData = stats.data_grafik_bidang_pks || [];
   
   const aktifCount = stats.data_grafik_status_pks.find(item => item.status === 'Aktif')?.jumlah || 0;
   const segeraBerakhirCount = stats.data_grafik_status_pks.find(item => item.status === 'Segera Berakhir')?.jumlah || 0;
@@ -221,8 +225,7 @@ export default function DashboardPage() {
       {/* Grid Grafik */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PKSBarChart 
-          iwkbuCount={iwkbuCount} 
-          iwklCount={iwklCount} 
+          bidangData={bidangData} 
         />
         <PKSPieChart 
           aktifCount={aktifCount} 

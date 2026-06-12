@@ -39,8 +39,7 @@ export default function DataPKSPage() {
   // State Filter & Pencarian
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
-  const [jenisPKSFilter, setJenisPKSFilter] = useState('Semua');
-  const [jenisObjekFilter, setJenisObjekFilter] = useState('Semua');
+  const [bidangFilter, setBidangFilter] = useState('Semua');
 
   // State Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,20 +67,18 @@ export default function DataPKSPage() {
       refreshPKS({
         search: searchQuery,
         status: statusFilter,
-        jenis_pks: jenisPKSFilter,
-        jenis_objek: jenisObjekFilter
+        bidang: bidangFilter
       });
     }, 300); // 300ms debounce for typing search
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, statusFilter, jenisPKSFilter, jenisObjekFilter, refreshPKS]);
+  }, [searchQuery, statusFilter, bidangFilter, refreshPKS]);
 
-  // Reset halaman aktif jika filter berubah
   useEffect(() => {
     Promise.resolve().then(() => {
       setCurrentPage(1);
     });
-  }, [searchQuery, statusFilter, jenisPKSFilter, jenisObjekFilter]);
+  }, [searchQuery, statusFilter, bidangFilter]);
 
   // Hitung data halaman aktif
   const totalPages = Math.ceil(filteredPKSList.length / itemsPerPage) || 1;
@@ -160,8 +157,7 @@ export default function DataPKSPage() {
       const queryParams = new URLSearchParams();
       if (searchQuery) queryParams.append('search', searchQuery);
       if (statusFilter && statusFilter !== 'Semua') queryParams.append('status', statusFilter);
-      if (jenisPKSFilter && jenisPKSFilter !== 'Semua') queryParams.append('jenis_pks', jenisPKSFilter);
-      if (jenisObjekFilter && jenisObjekFilter !== 'Semua') queryParams.append('jenis_objek', jenisObjekFilter);
+      if (bidangFilter && bidangFilter !== 'Semua') queryParams.append('bidang', bidangFilter);
       queryParams.append('format', 'xlsx');
 
       const filename = `Data_PKS_JasaRaharja_${new Date().toISOString().slice(0, 10)}.xlsx`;
@@ -192,10 +188,9 @@ export default function DataPKSPage() {
             <td style="font-family: monospace; font-weight: bold; color: #475569; font-size: 10px;">${pks.nomor_pks}</td>
             <td style="text-align: center;">
               <span style="background-color: #f1f5f9; color: #334155; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
-                ${pks.jenis_pks}
+                ${pks.bidang}
               </span>
             </td>
-            <td style="text-align: center; color: #475569; font-size: 10px;">${pks.jenis_objek}</td>
             <td style="color: #475569; font-size: 10px;">${formatDate(pks.tanggal_mulai)}</td>
             <td style="font-weight: bold; color: #334155; font-size: 10px;">${formatDate(pks.tanggal_berakhir)}</td>
             <td style="text-align: center;">
@@ -411,8 +406,8 @@ export default function DataPKSPage() {
               <span class="meta-value">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <div class="meta-item">
-              <span class="meta-label">Kategori PKS / Objek</span>
-              <span class="meta-value">PKS: ${jenisPKSFilter} | Objek: ${jenisObjekFilter}</span>
+              <span class="meta-label">Bidang PKS</span>
+              <span class="meta-value">${bidangFilter}</span>
             </div>
             <div class="meta-item">
               <span class="meta-label">Filter Status</span>
@@ -431,8 +426,7 @@ export default function DataPKSPage() {
                 <th style="width: 20%;">Nama Perusahaan</th>
                 <th style="width: 23%;">Alamat Perusahaan</th>
                 <th style="width: 15%;">Nomor Kontrak PKS</th>
-                <th style="width: 8%;" class="text-center">Jenis PKS</th>
-                <th style="width: 8%;" class="text-center">Jenis Objek</th>
+                <th style="width: 16%;" class="text-center">Bidang</th>
                 <th style="width: 8%;">Tanggal Mulai</th>
                 <th style="width: 8%;">Masa Berakhir</th>
                 <th style="width: 8%;" class="text-center">Status PKS</th>
@@ -503,7 +497,7 @@ export default function DataPKSPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           
           {/* Pencarian */}
-          <div className="space-y-1.5 lg:col-span-2">
+          <div className="space-y-1.5 lg:col-span-3">
             <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pencarian</label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#003b87] transition-colors">
@@ -534,31 +528,22 @@ export default function DataPKSPage() {
             </select>
           </div>
 
-          {/* Filter Jenis PKS */}
+          {/* Filter Bidang PKS */}
           <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis PKS</label>
+            <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">Bidang</label>
             <select
-              value={jenisPKSFilter}
-              onChange={(e) => setJenisPKSFilter(e.target.value)}
+              value={bidangFilter}
+              onChange={(e) => setBidangFilter(e.target.value)}
               className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
             >
-              <option value="Semua">Semua Kategori</option>
-              <option value="IWKBU">IWKBU</option>
-              <option value="IWKL">IWKL</option>
-            </select>
-          </div>
-
-          {/* Filter Jenis Objek */}
-          <div className="space-y-1.5">
-            <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis Objek</label>
-            <select
-              value={jenisObjekFilter}
-              onChange={(e) => setJenisObjekFilter(e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
-            >
-              <option value="Semua">Semua Objek</option>
-              <option value="Kendaraan">Kendaraan</option>
-              <option value="Kapal">Kapal</option>
+              <option value="Semua">Semua Bidang</option>
+              <option value="IW">IW</option>
+              <option value="SW">SW</option>
+              <option value="pelayanan">Pelayanan</option>
+              <option value="umum">Umum</option>
+              <option value="HC">HC</option>
+              <option value="keuangan">Keuangan</option>
+              <option value="tjsl">TJSL</option>
             </select>
           </div>
 
@@ -587,8 +572,7 @@ export default function DataPKSPage() {
                     <th className="py-4 px-6 text-center w-12">No</th>
                     <th className="py-4 px-6">Nama Perusahaan</th>
                     <th className="py-4 px-6">Nomor PKS</th>
-                    <th className="py-4 px-6 text-center">Jenis PKS</th>
-                    <th className="py-4 px-6 text-center">Jenis Objek</th>
+                    <th className="py-4 px-6 text-center">Bidang</th>
                     <th className="py-4 px-6">Tanggal Mulai</th>
                     <th className="py-4 px-6">Tanggal Berakhir</th>
                     <th className="py-4 px-6">Status PKS</th>
@@ -612,11 +596,8 @@ export default function DataPKSPage() {
                       <td className="py-4 px-6 font-mono text-slate-500 font-bold">{pks.nomor_pks}</td>
                       <td className="py-4 px-6 text-center">
                         <span className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">
-                          {pks.jenis_pks}
+                          {pks.bidang}
                         </span>
-                      </td>
-                      <td className="py-4 px-6 text-center text-slate-600">
-                        {pks.jenis_objek}
                       </td>
                       <td className="py-4 px-6 text-slate-500">{formatDate(pks.tanggal_mulai)}</td>
                       <td className="py-4 px-6 text-slate-600 font-bold">{formatDate(pks.tanggal_berakhir)}</td>

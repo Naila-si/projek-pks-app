@@ -32,14 +32,9 @@ class PksController extends Controller
             });
         }
 
-        // Filter by jenis_pks (IWKBU, IWKL)
-        if ($request->filled('jenis_pks')) {
-            $query->where('jenis_pks', $request->jenis_pks);
-        }
-
-        // Filter by jenis_objek (Kendaraan, Kapal)
-        if ($request->filled('jenis_objek')) {
-            $query->where('jenis_objek', $request->jenis_objek);
+        // Filter by bidang
+        if ($request->filled('bidang')) {
+            $query->where('bidang', $request->bidang);
         }
 
         // Filter by status_pks (Aktif, Segera Berakhir, Berakhir)
@@ -97,8 +92,7 @@ class PksController extends Controller
         $pks = DataPKS::create([
             'nomor_pks' => $request->nomor_pks,
             'judul_pks' => $request->judul_pks,
-            'jenis_pks' => $request->jenis_pks,
-            'jenis_objek' => $request->jenis_objek,
+            'bidang' => $request->bidang,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_berakhir' => $request->tanggal_berakhir,
             'tanggal_addendum' => $request->tanggal_addendum,
@@ -151,8 +145,7 @@ class PksController extends Controller
         $pks->update([
             'nomor_pks' => $request->nomor_pks,
             'judul_pks' => $request->judul_pks,
-            'jenis_pks' => $request->jenis_pks,
-            'jenis_objek' => $request->jenis_objek,
+            'bidang' => $request->bidang,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_berakhir' => $request->tanggal_berakhir,
             'tanggal_addendum' => $request->tanggal_addendum,

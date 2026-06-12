@@ -34,8 +34,7 @@ class DataPKS extends Model
     protected $fillable = [
         'nomor_pks',
         'judul_pks',
-        'jenis_pks',
-        'jenis_objek',
+        'bidang',
         'tanggal_mulai',
         'tanggal_berakhir',
         'tanggal_addendum',

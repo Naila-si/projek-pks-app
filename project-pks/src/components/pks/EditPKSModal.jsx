@@ -13,8 +13,7 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
   // State Input Form PKS
   const [nomorPKS, setNomorPKS] = useState('');
   const [judulPKS, setJudulPKS] = useState('');
-  const [jenisPKS, setJenisPKS] = useState('IWKBU');
-  const [jenisObjek, setJenisObjek] = useState('Kendaraan');
+  const [bidang, setBidang] = useState('IW');
   const [tanggalMulai, setTanggalMulai] = useState('');
   const [tanggalBerakhir, setTanggalBerakhir] = useState('');
   const [tanggalAddendum, setTanggalAddendum] = useState('');
@@ -28,8 +27,7 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
           setPks(data);
           setNomorPKS(data.nomor_pks || '');
           setJudulPKS(data.judul_pks || '');
-          setJenisPKS(data.jenis_pks || 'IWKBU');
-          setJenisObjek(data.jenis_objek || 'Kendaraan');
+          setBidang(data.bidang || 'IW');
           setTanggalMulai(data.tanggal_mulai || '');
           setTanggalBerakhir(data.tanggal_berakhir || '');
           setTanggalAddendum(data.tanggal_addendum || '');
@@ -71,8 +69,7 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
       ...pks,
       nomor_pks: nomorPKS,
       judul_pks: judulPKS,
-      jenis_pks: jenisPKS,
-      jenis_objek: jenisObjek,
+      bidang: bidang,
       tanggal_mulai: tanggalMulai,
       tanggal_berakhir: tanggalBerakhir,
       tanggal_addendum: tanggalAddendum || null,
@@ -145,33 +142,23 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
               />
             </div>
 
-            {/* Jenis PKS */}
-            <div className="space-y-1.5">
+            {/* Bidang */}
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Jenis PKS
+                Bidang <span className="text-rose-500">*</span>
               </label>
               <select
-                value={jenisPKS}
-                onChange={(e) => setJenisPKS(e.target.value)}
+                value={bidang}
+                onChange={(e) => setBidang(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
               >
-                <option value="IWKBU">IWKBU (Iuran Wajib Kendaraan Bermotor Umum)</option>
-                <option value="IWKL">IWKL (Iuran Wajib Kapal Laut)</option>
-              </select>
-            </div>
-
-            {/* Jenis Objek */}
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Jenis Objek
-              </label>
-              <select
-                value={jenisObjek}
-                onChange={(e) => setJenisObjek(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
-              >
-                <option value="Kendaraan">Kendaraan</option>
-                <option value="Kapal">Kapal</option>
+                <option value="IW">IW (Iuran Wajib)</option>
+                <option value="SW">SW (Sumbangan Wajib)</option>
+                <option value="pelayanan">Pelayanan</option>
+                <option value="umum">Umum</option>
+                <option value="HC">HC (Human Capital)</option>
+                <option value="keuangan">Keuangan</option>
+                <option value="tjsl">TJSL (Tanggung Jawab Sosial & Lingkungan)</option>
               </select>
             </div>
 
