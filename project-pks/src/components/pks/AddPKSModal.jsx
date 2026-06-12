@@ -18,7 +18,6 @@ export default function AddPKSModal({ onClose, onSubmit }) {
   const [bidang, setBidang] = useState('IW');
   const [tanggalMulai, setTanggalMulai] = useState('');
   const [tanggalBerakhir, setTanggalBerakhir] = useState('');
-  const [tanggalAddendum, setTanggalAddendum] = useState('');
   const [documentFile, setDocumentFile] = useState(null);
 
   const handleFileChange = (e) => {
@@ -61,7 +60,6 @@ export default function AddPKSModal({ onClose, onSubmit }) {
       bidang: bidang,
       tanggal_mulai: tanggalMulai,
       tanggal_berakhir: tanggalBerakhir,
-      tanggal_addendum: tanggalAddendum || null,
       dokumen_pks: documentFile
     };
 
@@ -251,20 +249,7 @@ export default function AddPKSModal({ onClose, onSubmit }) {
                 </div>
               </div>
 
-              {/* Tanggal Addendum */}
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                  Tanggal Addendum (Amandemen Kontrak)
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={tanggalAddendum}
-                    onChange={(e) => setTanggalAddendum(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
-                  />
-                </div>
-              </div>
+
 
               {/* Upload Dokumen */}
               <div className="space-y-1.5">

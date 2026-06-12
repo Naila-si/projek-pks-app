@@ -1,49 +1,46 @@
-// src/components/pks/EditPKSModal.jsx
+// src/components/pks/EditAddendumModal.jsx
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Upload } from 'lucide-react';
-import { usePKS } from '../../hooks/usePKS';
+import { X, FileText, Upload, Link } from 'lucide-react';
+import { useAddendum } from '../../hooks/useAddendum';
 import Button from '../common/Button';
 import { toast } from '../../utils/toast';
 
-export default function EditPKSModal({ pksId, onClose, onSubmit }) {
-  const { getPKSById } = usePKS();
-  const [pks, setPks] = useState(null);
+export default function EditAddendumModal({ addendumId, onClose, onSubmit }) {
+  const { getAddendumById } = useAddendum();
+  const [addendum, setAddendum] = useState(null);
   
-  // State Input Form PKS
-  const [nomorPKS, setNomorPKS] = useState('');
-  const [judulPKS, setJudulPKS] = useState('');
-  const [bidang, setBidang] = useState('IW');
+  // State Input Form Addendum
+  const [nomorAddendum, setNomorAddendum] = useState('');
+  const [judulAddendum, setJudulAddendum] = useState('');
   const [tanggalMulai, setTanggalMulai] = useState('');
   const [tanggalBerakhir, setTanggalBerakhir] = useState('');
   const [documentFile, setDocumentFile] = useState(null);
 
-  // Ambil data PKS dari backend saat mount
+  // Ambil data Addendum saat mount
   useEffect(() => {
-    if (pksId) {
-      getPKSById(pksId).then(data => {
+    if (addendumId) {
+      getAddendumById(addendumId).then(data => {
         if (data) {
-          setPks(data);
-          setNomorPKS(data.nomor_pks || '');
-          setJudulPKS(data.judul_pks || '');
-          setBidang(data.bidang || 'IW');
+          setAddendum(data);
+          setNomorAddendum(data.nomor_addendum || '');
+          setJudulAddendum(data.judul_addendum || '');
           setTanggalMulai(data.tanggal_mulai || '');
           setTanggalBerakhir(data.tanggal_berakhir || '');
         }
       }).catch(err => {
-        console.error('Failed to load PKS details:', err);
-        toast.error('Gagal memuat detail PKS dari server.');
+        console.error('Failed to load addendum details:', err);
+        toast.error('Gagal memuat detail addendum.');
       });
     }
-  }, [pksId, getPKSById]);
+  }, [addendumId, getAddendumById]);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      // Pengecekan instan ukuran file (10MB = 10 * 1024 * 1024 bytes)
       if (file.size > 10 * 1024 * 1024) {
         toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Ukuran Berkas Terlalu Besar');
-        e.target.value = ''; // Reset inputan file
+        e.target.value = '';
         setDocumentFile(null);
         return;
       }
@@ -53,30 +50,24 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!nomorPKS || !judulPKS || !tanggalMulai || !tanggalBerakhir) {
+    if (!judulAddendum || !tanggalMulai || !tanggalBerakhir) {
       toast.warning('Harap isi semua kolom wajib!');
       return;
     }
 
-    if (documentFile && documentFile.size > 10 * 1024 * 1024) {
-      toast.error('Ukuran berkas PDF tidak boleh melebihi 10 MB!', 'Gagal Menyimpan');
-      return;
-    }
-
-    const updatedPKS = {
-      ...pks,
-      nomor_pks: nomorPKS,
-      judul_pks: judulPKS,
-      bidang: bidang,
+    const updatedAddendum = {
+      ...addendum,
+      nomor_addendum: nomorAddendum,
+      judul_addendum: judulAddendum,
       tanggal_mulai: tanggalMulai,
       tanggal_berakhir: tanggalBerakhir,
-      dokumen_pks: documentFile // Pass actual File object if selected
+      dokumen_addendum: documentFile // file object or null
     };
 
-    onSubmit(updatedPKS);
+    onSubmit(updatedAddendum);
   };
 
-  if (!pks) return null;
+  if (!addendum) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-[100] overflow-y-auto glass-overlay flex items-center justify-center p-4">
@@ -86,11 +77,11 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#003b87] flex items-center justify-center border border-blue-100">
-              <FileText className="w-5 h-5 animate-pulse-soft" />
+              <Link className="w-5 h-5 animate-pulse-soft" />
             </div>
             <div>
-              <h3 className="font-extrabold text-slate-800 text-base sm:text-lg">Ubah Data Perjanjian PKS</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Ubah informasi masa berlaku dan ketentuan kontrak PKS</p>
+              <h3 className="font-extrabold text-slate-800 text-base sm:text-lg">Ubah Dokumen Addendum PKS</h3>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Sesuaikan isi Klausul dan tanggal Addendum PKS</p>
             </div>
           </div>
           <button 
@@ -104,64 +95,39 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
         {/* Form Isi */}
         <form onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
           
-          <div className="bg-[#e8f1fc] p-4 rounded-xl border border-blue-100 text-xs font-semibold text-[#003b87] leading-relaxed">
-            <span className="font-extrabold uppercase tracking-wide block mb-1">Catatan Keamanan</span>
-            Sesuai regulasi sistem, perubahan profil perusahaan (alamat, kontak, email) harus diubah melalui menu <strong>Data Perusahaan</strong> demi menjaga integritas data relasi.
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
-            {/* Nomor PKS */}
+            {/* Nomor Addendum (Read-Only) */}
             <div className="space-y-1.5 sm:col-span-2">
               <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
-                Nomor Surat PKS <span className="text-slate-400 font-normal">(Tidak dapat diubah)</span>
+                Nomor Surat Addendum <span className="text-slate-400 font-normal">(Tidak dapat diubah)</span>
               </label>
               <input
                 type="text"
                 disabled
-                value={nomorPKS}
+                value={nomorAddendum}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-400 cursor-not-allowed focus:outline-none"
               />
             </div>
 
-            {/* Judul PKS */}
+            {/* Judul Addendum */}
             <div className="space-y-1.5 sm:col-span-2">
               <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Judul Perjanjian PKS <span className="text-rose-500">*</span>
+                Judul Dokumen Addendum <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 required
-                value={judulPKS}
-                onChange={(e) => setJudulPKS(e.target.value)}
+                value={judulAddendum}
+                onChange={(e) => setJudulAddendum(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
               />
-            </div>
-
-            {/* Bidang */}
-            <div className="space-y-1.5 sm:col-span-2">
-              <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Bidang <span className="text-rose-500">*</span>
-              </label>
-              <select
-                value={bidang}
-                onChange={(e) => setBidang(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600/10 focus:border-[#003b87] transition-all"
-              >
-                <option value="IW">IW (Iuran Wajib)</option>
-                <option value="SW">SW (Sumbangan Wajib)</option>
-                <option value="pelayanan">Pelayanan</option>
-                <option value="umum">Umum</option>
-                <option value="HC">HC (Human Capital)</option>
-                <option value="keuangan">Keuangan</option>
-                <option value="tjsl">TJSL (Tanggung Jawab Sosial & Lingkungan)</option>
-              </select>
             </div>
 
             {/* Tanggal Mulai */}
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Tanggal Mulai Berlaku <span className="text-rose-500">*</span>
+                Tanggal Mulai Berlaku Addendum <span className="text-rose-500">*</span>
               </label>
               <input
                 type="date"
@@ -175,7 +141,7 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
             {/* Tanggal Berakhir */}
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Tanggal Berakhir Berlaku <span className="text-rose-500">*</span>
+                Tanggal Berakhir Berlaku Addendum <span className="text-rose-500">*</span>
               </label>
               <input
                 type="date"
@@ -186,12 +152,10 @@ export default function EditPKSModal({ pksId, onClose, onSubmit }) {
               />
             </div>
 
-
-
-            {/* Upload Dokumen */}
-            <div className="space-y-1.5">
+            {/* Upload PDF Baru */}
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                Unggah Dokumen Surat PKS (PDF Baru)
+                Unggah Dokumen Addendum Baru (PDF, Opsional)
               </label>
               <label className="flex flex-col items-center justify-center w-full h-11 border border-dashed border-slate-200 rounded-xl cursor-pointer bg-slate-50/50 hover:bg-slate-50 transition-colors px-4">
                 <div className="flex items-center gap-2">

@@ -28,7 +28,6 @@ class StorePKSRequest extends FormRequest
             'bidang' => 'required|in:IW,SW,pelayanan,umum,HC,keuangan,tjsl',
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
-            'tanggal_addendum' => 'nullable|date',
             'dokumen_pks' => 'required|file|mimes:pdf|max:10240', // max 10MB
             
             // Existing company check

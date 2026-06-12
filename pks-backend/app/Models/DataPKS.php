@@ -37,7 +37,6 @@ class DataPKS extends Model
         'bidang',
         'tanggal_mulai',
         'tanggal_berakhir',
-        'tanggal_addendum',
         'status_pks',
         'dokumen_pks',
         'id_perusahaan',
@@ -64,6 +63,14 @@ class DataPKS extends Model
     public function notifikasi(): HasMany
     {
         return $this->hasMany(Notifikasi::class, 'id_pks', 'id_pks');
+    }
+
+    /**
+     * Get the addenda for the PKS.
+     */
+    public function addenda(): HasMany
+    {
+        return $this->hasMany(AddendumPKS::class, 'id_pks', 'id_pks');
     }
 
     /**

@@ -121,7 +121,6 @@ class PksController extends Controller
                 'bidang' => $request->bidang,
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_berakhir' => $request->tanggal_berakhir,
-                'tanggal_addendum' => $request->tanggal_addendum,
                 'dokumen_pks' => $filename,
                 'id_perusahaan' => $id_perusahaan,
             ]);
@@ -139,7 +138,7 @@ class PksController extends Controller
      */
     public function show($id)
     {
-        $pks = DataPKS::with('perusahaan')->findOrFail($id);
+        $pks = DataPKS::with(['perusahaan', 'addenda'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -175,7 +174,6 @@ class PksController extends Controller
             'bidang' => $request->bidang,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_berakhir' => $request->tanggal_berakhir,
-            'tanggal_addendum' => $request->tanggal_addendum,
             'dokumen_pks' => $filename,
             'id_perusahaan' => $request->id_perusahaan,
         ]);

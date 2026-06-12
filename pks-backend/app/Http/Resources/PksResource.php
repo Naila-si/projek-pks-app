@@ -22,12 +22,12 @@ class PksResource extends JsonResource
             'bidang' => $this->bidang,
             'tanggal_mulai' => $this->tanggal_mulai,
             'tanggal_berakhir' => $this->tanggal_berakhir,
-            'tanggal_addendum' => $this->tanggal_addendum,
             'status_pks' => $this->status_pks, // dynamic accessor
             'dokumen_pks' => $this->dokumen_pks,
             'dokumen_pks_url' => $this->dokumen_pks ? asset('storage/pks/' . $this->dokumen_pks) : null,
             'id_perusahaan' => $this->id_perusahaan,
             'perusahaan' => new PerusahaanResource($this->whenLoaded('perusahaan')),
+            'addenda' => AddendumResource::collection($this->whenLoaded('addenda')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

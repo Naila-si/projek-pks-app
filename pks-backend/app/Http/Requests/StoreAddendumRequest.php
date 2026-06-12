@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdatePKSRequest extends FormRequest
+class StoreAddendumRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,16 +21,13 @@ class UpdatePKSRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('id');
-
         return [
-            'nomor_pks' => 'required|string|max:100|unique:data_pks,nomor_pks,' . $id . ',id_pks',
-            'judul_pks' => 'required|string|max:255',
-            'bidang' => 'required|in:IW,SW,pelayanan,umum,HC,keuangan,tjsl',
+            'id_pks' => 'required|integer|exists:data_pks,id_pks',
+            'nomor_addendum' => 'nullable|string|max:100|unique:addendum_pks,nomor_addendum',
+            'judul_addendum' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
-            'dokumen_pks' => 'nullable|file|mimes:pdf|max:10240', // max 10MB, optional on update
-            'id_perusahaan' => 'required|integer|exists:perusahaan,id_perusahaan',
+            'dokumen_addendum' => 'required|file|mimes:pdf|max:10240', // max 10MB
         ];
     }
 
@@ -40,9 +37,10 @@ class UpdatePKSRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nomor_pks.unique' => 'Nomor PKS sudah digunakan.',
-            'dokumen_pks.mimes' => 'Dokumen PKS harus berupa file PDF.',
-            'dokumen_pks.max' => 'Ukuran dokumen PKS maksimal adalah 10 MB.',
+            'nomor_addendum.unique' => 'Nomor Addendum sudah digunakan.',
+            'dokumen_addendum.required' => 'Dokumen Addendum wajib diunggah.',
+            'dokumen_addendum.mimes' => 'Dokumen Addendum harus berupa file PDF.',
+            'dokumen_addendum.max' => 'Ukuran dokumen Addendum maksimal adalah 10 MB.',
             'tanggal_berakhir.after_or_equal' => 'Tanggal berakhir harus sama dengan atau setelah tanggal mulai.',
         ];
     }

@@ -1,5 +1,5 @@
 // src/components/pks/DetailPKSModal.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -12,20 +12,51 @@ import {
   ArrowRight,
   Download,
   Edit,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { usePKS } from "../../hooks/usePKS";
+import { useAddendum } from "../../hooks/useAddendum";
 import { toast } from "../../utils/toast";
 import { formatDate, formatDateFull } from "../../utils/formatDate";
 import StatusBadge from "../common/StatusBadge";
 import Button from "../common/Button";
 import EditPKSModal from "./EditPKSModal";
+import AddAddendumModal from "./AddAddendumModal";
+import EditAddendumModal from "./EditAddendumModal";
+import DetailAddendumModal from "./DetailAddendumModal";
 
 export default function DetailPKSModal({ pksId, onClose }) {
-  const { getPKSById, editPKS } = usePKS();
+  const { getPKSById, editPKS, refreshPKS } = usePKS();
+  const { addAddendum, editAddendum, deleteAddendum } = useAddendum();
   const [pks, setPks] = useState(null);
   const [company, setCompany] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  
+  // States for Addendum sub-modals
+  const [isAddAddendumOpen, setIsAddAddendumOpen] = useState(false);
+  const [isEditAddendumOpen, setIsEditAddendumOpen] = useState(false);
+  const [isDetailAddendumOpen, setIsDetailAddendumOpen] = useState(false);
+  const [selectedAddendumId, setSelectedAddendumId] = useState(null);
+
+  const fetchDetails = useCallback(() => {
+    if (pksId) {
+      getPKSById(pksId).then(data => {
+        if (data) {
+          setPks(data);
+          setCompany(data.perusahaan);
+        }
+      }).catch(err => {
+        console.error('Failed to load PKS details:', err);
+        toast.error('Gagal memuat detail PKS dari server.');
+      });
+    }
+  }, [pksId, getPKSById]);
+
+  useEffect(() => {
+    fetchDetails();
+  }, [fetchDetails]);
 
   const handleEditSubmit = (updatedPKS) => {
     const pksIdValue = pks?.id_pks || pks?.id;
@@ -46,19 +77,54 @@ export default function DetailPKSModal({ pksId, onClose }) {
       });
   };
 
-  useEffect(() => {
-    if (pksId) {
-      getPKSById(pksId).then(data => {
-        if (data) {
-          setPks(data);
-          setCompany(data.perusahaan);
+  const handleAddendumSubmit = (addendumData) => {
+    addAddendum(addendumData)
+      .then(response => {
+        if (response.success) {
+          toast.success('Dokumen Addendum berhasil ditambahkan.');
+          setIsAddAddendumOpen(false);
+          fetchDetails();
+          refreshPKS(); // Keep the main table synchronized
         }
-      }).catch(err => {
-        console.error('Failed to load PKS details:', err);
-        toast.error('Gagal memuat detail PKS dari server.');
+      })
+      .catch(err => {
+        console.error('Failed to add addendum:', err);
+        toast.error(err.message || 'Gagal menyimpan addendum baru.');
       });
+  };
+
+  const handleEditAddendumSubmit = (updatedAddendum) => {
+    if (!selectedAddendumId) return;
+    editAddendum(selectedAddendumId, updatedAddendum)
+      .then(response => {
+        if (response.success) {
+          toast.success('Dokumen Addendum berhasil diperbarui.');
+          setIsEditAddendumOpen(false);
+          setSelectedAddendumId(null);
+          fetchDetails();
+          refreshPKS(); // Keep the main table synchronized
+        }
+      })
+      .catch(err => {
+        console.error('Failed to update addendum:', err);
+        toast.error(err.message || 'Gagal memperbarui addendum.');
+      });
+  };
+
+  const handleDeleteAddendumClick = (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus dokumen addendum ini?")) {
+      deleteAddendum(id)
+        .then(() => {
+          toast.success("Dokumen Addendum berhasil dihapus.");
+          fetchDetails();
+          refreshPKS(); // Keep the main table synchronized
+        })
+        .catch((err) => {
+          console.error("Failed to delete addendum:", err);
+          toast.error(err.message || "Gagal menghapus addendum.");
+        });
     }
-  }, [pksId, getPKSById]);
+  };
 
   if (!pks || !company) return null;
 
@@ -195,18 +261,6 @@ export default function DetailPKSModal({ pksId, onClose }) {
                     <span>{formatDate(pks.tanggal_berakhir)}</span>
                   </div>
                 </div>
-
-                {/* Tanggal Addendum */}
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Tanggal Addendum
-                  </span>
-                  <p className="text-slate-800 text-xs font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 inline-block font-mono">
-                    {pks.tanggal_addendum
-                      ? formatDateFull(pks.tanggal_addendum)
-                      : "Belum Pernah Melakukan Addendum"}
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -258,6 +312,93 @@ export default function DetailPKSModal({ pksId, onClose }) {
               </div>
             </div>
           </div>
+
+          {/* SEKTOR III: RIWAYAT ADDENDUM PKS */}
+          <div className="border-t border-slate-100 pt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[#003b87]">
+                <FileText className="w-4.5 h-4.5" />
+                <h4 className="font-bold text-xs sm:text-sm uppercase tracking-wider">
+                  III. Riwayat Addendum PKS
+                </h4>
+              </div>
+              <Button
+                variant="outline"
+                icon={Plus}
+                size="sm"
+                className="border-[#003b87] text-[#003b87] hover:bg-blue-50/50 text-[11px]"
+                onClick={() => setIsAddAddendumOpen(true)}
+              >
+                Buat Addendum PKS
+              </Button>
+            </div>
+
+            {/* List/Table of Addenda */}
+            {!pks.addenda || pks.addenda.length === 0 ? (
+              <div className="bg-slate-50 rounded-xl p-6 border border-dashed border-slate-200 text-center text-slate-400 text-xs font-semibold">
+                Belum ada dokumen addendum untuk PKS ini.
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100 font-bold uppercase tracking-wider text-slate-400 text-[10px]">
+                      <th className="py-3 px-4">Nomor Addendum</th>
+                      <th className="py-3 px-4">Judul Addendum</th>
+                      <th className="py-3 px-4">Masa Berlaku</th>
+                      <th className="py-3 px-4 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
+                    {pks.addenda.map((addendum) => (
+                      <tr key={addendum.id_addendum} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                          {addendum.nomor_addendum}
+                        </td>
+                        <td className="py-3 px-4 max-w-[200px] truncate text-slate-800">
+                          {addendum.judul_addendum}
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap text-[11px]">
+                          {formatDate(addendum.tanggal_mulai)} - {formatDate(addendum.tanggal_berakhir)}
+                        </td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <div className="inline-flex items-center gap-1.5">
+                            <button
+                              onClick={() => {
+                                setSelectedAddendumId(addendum.id_addendum);
+                                setIsDetailAddendumOpen(true);
+                              }}
+                              className="p-1 rounded-lg text-slate-400 hover:text-[#003b87] hover:bg-blue-50 transition-colors cursor-pointer"
+                              title="Lihat Detail"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedAddendumId(addendum.id_addendum);
+                                setIsEditAddendumOpen(true);
+                              }}
+                              className="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                              title="Ubah Addendum"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteAddendumClick(addendum.id_addendum)}
+                              className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              title="Hapus Addendum"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer Modal Buttons */}
@@ -292,6 +433,32 @@ export default function DetailPKSModal({ pksId, onClose }) {
           pksId={pks?.id_pks || pks?.id}
           onClose={() => setIsEditOpen(false)}
           onSubmit={handleEditSubmit}
+        />
+      )}
+      {isAddAddendumOpen && (
+        <AddAddendumModal
+          pks={pks}
+          onClose={() => setIsAddAddendumOpen(false)}
+          onSubmit={handleAddendumSubmit}
+        />
+      )}
+      {isEditAddendumOpen && (
+        <EditAddendumModal
+          addendumId={selectedAddendumId}
+          onClose={() => {
+            setIsEditAddendumOpen(false);
+            setSelectedAddendumId(null);
+          }}
+          onSubmit={handleEditAddendumSubmit}
+        />
+      )}
+      {isDetailAddendumOpen && (
+        <DetailAddendumModal
+          addendumId={selectedAddendumId}
+          onClose={() => {
+            setIsDetailAddendumOpen(false);
+            setSelectedAddendumId(null);
+          }}
         />
       )}
     </div>,

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PksController;
 use App\Http\Controllers\Api\PerusahaanController;
 use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\AddendumController;
 
 // Public route for login
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,6 +28,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/pks/{id}', [PksController::class, 'update']);
     Route::post('/pks/{id}', [PksController::class, 'update']); // Fallback POST route for multipart/form-data file uploads with PUT method spoofing
     Route::delete('/pks/{id}', [PksController::class, 'destroy']);
+
+    // Addendum Management
+    Route::post('/addendum', [AddendumController::class, 'store']);
+    Route::get('/addendum/{id}', [AddendumController::class, 'show']);
+    Route::get('/addendum/{id}/download', [AddendumController::class, 'downloadDokumen']);
+    Route::put('/addendum/{id}', [AddendumController::class, 'update']);
+    Route::post('/addendum/{id}', [AddendumController::class, 'update']); // Fallback POST route with PUT method spoofing
+    Route::delete('/addendum/{id}', [AddendumController::class, 'destroy']);
 
     // Company Directory
     Route::get('/perusahaan', [PerusahaanController::class, 'index']);
